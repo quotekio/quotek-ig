@@ -28,13 +28,16 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "broker.h"
+#include "assoc.h"
+#include "utils.h"
+
 #include <curl/curl.h>
-#include "../rapidjson/rapidjson.h"
-#include "../rapidjson/document.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/document.h"
 #include <stdlib.h>
-#include "../utils.h"
-#include "../assoc.h"
 #include <pthread.h>
+#include "lsclient/lsclient.h"
+
 
 #define MAX_UPTIME 42000
 
@@ -53,9 +56,7 @@ public:
 
     bool requires_indices_list;
 
-    virtual int init(string params) {
-      
-      cout << "Initializing broker Module.." << endl;      
+    igConnector(string params, bool use_logging, bool use_profiling ) {
 
       rapidjson::Document d;
       d.Parse<0>(params.c_str());
@@ -63,15 +64,13 @@ public:
       username = d["username"].GetString();
       password = d["password"].GetString();
       api_key = d["api_key"].GetString();
+      api_url = d["api_url"].GetString();
 
-      api_url = "https://demo-api.ig.com";
-      requires_indices_list = 1;
-      
+      requires_indices_list = true;
+
       //creates uptime loop, to reconnect when IG session expires.
       pthread_t uptime_loop;
       pthread_create(&uptime_loop,NULL,igConnector::staticUptimeLoop, this);
-
-      return 0;
 
     }
 
@@ -87,8 +86,7 @@ public:
     }
   
     virtual int connect() {
-      cout << "(Re)Starting broker connection.." << endl;
-
+      
       cst = "";
       security_token = "";
 
@@ -188,8 +186,8 @@ public:
 
           bvex ex1;
           ex1.epic = d["marketDetails"][rapidjson::SizeType(i)]["instrument"]["epic"].GetString();
-          ex1.buy = d["marketDetails"][rapidjson::SizeType(i)]["snapshot"]["offer"].GetDouble();
-          ex1.sell = d["marketDetails"][rapidjson::SizeType(i)]["snapshot"]["bid"].GetDouble();
+          ex1.offer = d["marketDetails"][rapidjson::SizeType(i)]["snapshot"]["offer"].GetDouble();
+          ex1.bid = d["marketDetails"][rapidjson::SizeType(i)]["snapshot"]["bid"].GetDouble();
           result.push_back(ex1);
 
         }
@@ -401,6 +399,7 @@ private:
   AssocArray<string> currencies_map;
   vector<bpex> lastpos;
   int uptime_s;
+  LSClient* ls_client;
 
   inline curl_slist* addHeaders() {
 
