@@ -28,11 +28,41 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <igconnector/broker.h>
+#include <assert.h>
+#include <dlfcn.h>
+
+create_t* load_broker(string bname)  {
+  string lib_broker = "lib" + bname + ".so";
+  void* handle = dlopen(lib_broker.c_str(),RTLD_LAZY);
+
+  if(handle == NULL){
+    cerr << dlerror() << endl;
+    exit(1);
+  }
+
+  create_t* create_broker = (create_t*) dlsym(handle, "create");
+  const char* dlsym_error = dlerror();
+    if (dlsym_error) {
+        cerr << "Cannot load symbol create: " << dlsym_error << endl;
+        exit(1);
+  }
+  return create_broker;
+}
+
+broker* get_broker() {
+  broker* b = load_broker("igconnector3")();  
+  return b;
+}
 
 int main(int argc, char** argv) {
   
-  cout << "[TEST BROKER] Connection" << endl;
-  broker* b = new broker(argv[1], false, false);
+  cout << "[TEST BROKER] Connection.." ;
+  broker* b = get_broker();
+  b->initialize(argv[1], false, false);
   assert( b->connect() == 0 ) ;
+
+  cout << "[OK]" << endl;
+
+
 }
 

@@ -28,10 +28,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-LSClient::LSClient(string url, 
-    		       string username, 
-    		       string password, 
-    		       vector<string>* subscribtions) {
+LSClient::LSClient(std::string url, 
+    		       std::string username, 
+    		       std::string password, 
+    		       std::vector<std::string>* subscribtions) {
 
   ls_url = url;
   ls_username = username;

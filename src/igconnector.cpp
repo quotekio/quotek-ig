@@ -56,7 +56,7 @@ public:
 
     bool requires_indices_list;
 
-    igConnector(string params, bool use_logging, bool use_profiling ) {
+    virtual int initialize(string params, bool use_logging, bool use_profiling ) {
 
       rapidjson::Document d;
       d.Parse<0>(params.c_str());
@@ -72,6 +72,7 @@ public:
       pthread_t uptime_loop;
       pthread_create(&uptime_loop,NULL,igConnector::staticUptimeLoop, this);
 
+      return 0;
     }
 
     virtual int requiresIndicesList() {
@@ -79,9 +80,7 @@ public:
     }
 
     virtual int setIndicesList(vector<string> il) {
-      cout << "Setting Broker Indices List.." << endl;
       ilist = il;
-
       return 0;
     }
   
@@ -124,7 +123,11 @@ public:
       rapidjson::Document d;
 
       d.Parse<0>(temp.c_str());
-      if (d.HasParseError() ) return 1;
+      if (d.HasParseError() ) {
+        
+        return 1;
+        cout << "PARSE ERROR" << endl;
+      }
      
       vector<string> hdata = split(htemp,'\n');
 
@@ -141,6 +144,7 @@ public:
       }
 
       if ( cst == "" || security_token == "") {
+        cout << "NO TOKEN" << endl;
         return 1;
       }
 
@@ -510,7 +514,7 @@ private:
 
 // the class factories
 extern "C" broker* create() {
-    return new igConnector;
+    return new igConnector();
 }
 
 extern "C" void destroy(broker* p) {

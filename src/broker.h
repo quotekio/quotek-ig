@@ -41,8 +41,9 @@ using namespace std;
 class broker {
 
 public:
-    broker(string params, bool use_logging, bool use_profiling ) {}
+    broker() {}
     virtual ~broker() {}
+    virtual int initialize(string params, bool use_logging, bool use_profiling) {return 0; }
     virtual int connect() {return 0;}
     virtual int requiresIndicesList() {return 0;}
     virtual int setIndicesList(vector<string> il) { return 0;}

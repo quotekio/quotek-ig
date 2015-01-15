@@ -14,32 +14,17 @@ SET (CMAKE_NM      "/usr/bin/llvm-nm")
 SET (CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
 SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
 
-
-add_library(
-        igconnector3 SHARED
-        src/broker.h
-        src/igconnector.cpp
-        src/utils.cpp
-        src/lsclient/lsclient.cpp
+add_executable(
+        test_connect
+        test_connect.cpp
 )
-
-#add_executable(
-#        test_connect
-#        tests/test_connect.cpp
-#)
-
-find_library (PTHREAD pthread) 
-find_library (CURL curl)
 
 target_link_libraries(
+  test_connect
   igconnector3
-  curl
-  pthread
+  dl
 )
 
-install (TARGETS igconnector3 DESTINATION lib)
-install (FILES "src/broker.h" DESTINATION include/igconnector/)
-install (FILES "src/brokerio.h" DESTINATION include/igconnector/)
 
 
 

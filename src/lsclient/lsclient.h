@@ -27,23 +27,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <vector>
+#include <string>
+
 class LSClient {
 
   public:
 
-    LSClient(string url, 
-    		     string username, 
-    		     string password, 
-    		     vector<string>* subscribtions);
+    LSClient(std::string url, 
+    		     std::string username, 
+    		     std::string password, 
+    		     std::vector<std::string>* subscribtions);
 
     int connect();
     void* receive_loop(void*);
 
   private:
 
-  	string ls_url;
-  	string ls_username;
-  	string ls_password;
-  	vector<string>* ls_subscribtions;
+  	std::string ls_url;
+  	std::string ls_username;
+  	std::string ls_password;
+  	std::vector<std::string>* ls_subscribtions;
 
 };
