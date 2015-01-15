@@ -30,4 +30,7 @@ std::string int2string(int i);
 int roundint(double r);
 std::string &upper(std::string &s);
 
+size_t curl_write_handler(void*, size_t, size_t, std::string stream);
+
+
 #endif

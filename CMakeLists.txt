@@ -17,7 +17,7 @@ SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
 
 add_library(
         igconnector3 SHARED
-        src/broker.h
+        src/broker.cpp
         src/igconnector.cpp
         src/utils.cpp
         src/lsclient/lsclient.cpp
@@ -38,7 +38,7 @@ target_link_libraries(
 )
 
 install (TARGETS igconnector3 DESTINATION lib)
-install (FILES "src/broker.h" DESTINATION include/igconnector/)
+install (FILES "src/broker.hpp" DESTINATION include/igconnector/)
 install (FILES "src/brokerio.h" DESTINATION include/igconnector/)
 
 

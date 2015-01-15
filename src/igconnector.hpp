@@ -27,42 +27,56 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <igconnector/broker.hpp>
-#include <assert.h>
-#include <dlfcn.h>
+#include "broker.hpp"
+#include "assoc.h"
+#include "utils.h"
 
-create_t* load_broker(string bname)  {
-  string lib_broker = "lib" + bname + ".so";
-  void* handle = dlopen(lib_broker.c_str(),RTLD_LAZY);
+#include <curl/curl.h>
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/document.h"
+#include <stdlib.h>
+#include <pthread.h>
+#include "lsclient/lsclient.h"
 
-  if(handle == NULL){
-    cerr << dlerror() << endl;
-    exit(1);
-  }
+#define MAX_UPTIME 42000
 
-  create_t* create_broker = (create_t*) dlsym(handle, "create");
-  const char* dlsym_error = dlerror();
-    if (dlsym_error) {
-        cerr << "Cannot load symbol create: " << dlsym_error << endl;
-        exit(1);
-  }
-  return create_broker;
-}
 
-broker* get_broker() {
-  broker* b = load_broker("igconnector3")();  
-  return b;
-}
+class igConnector : public broker {
+public:
 
-int main(int argc, char** argv) {
+    bool requires_indices_list;
+
+    igConnector();
+    igConnector(string, bool, bool, string);
+    virtual int initialize(string, bool, bool, string);
+    virtual int requiresIndicesList();
+    virtual int setIndicesList(vector<string>);
+    virtual int connect();
+    virtual vector<bvex> getValues();
+    virtual vector<bpex> getPositions();
+    virtual string openPos(string,string,int,int,int);
+    virtual string closePos(string);
   
-  cout << "[TEST BROKER] Connection.." ;
-  broker* b = get_broker();
-  b->initialize(argv[1], false, false,"pull");
-  assert( b->connect() == 0 ) ;
+private:
+  
+  string cst;
+  string security_token;
+  AssocArray<string> currencies_map;
+  vector<bpex> lastpos;
+  int uptime_s;
+  LSClient* ls_client;
 
-  cout << "[OK]" << endl;
+  inline curl_slist* addHeaders();
+  static void* staticUptimeLoop(void* p);
+  void* uptimeLoop(void*);
+  void loadCurrenciesMap();
+};
 
-
+// the class factories
+extern "C" broker* create() {
+    return new igConnector();
 }
 
+extern "C" void destroy(broker* p) {
+    delete p;
+}

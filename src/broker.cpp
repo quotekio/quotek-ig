@@ -27,45 +27,68 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "broker.hpp"
 
-#ifndef broker_H
-#define broker_H
+broker::broker() {
 
-#include <vector>
-#include <string>
-#include <iostream>
-#include "brokerio.h"
+}
 
-using namespace std;
+broker::~broker() {
 
-class broker {
+}
 
-public:
-    broker() {}
-    virtual ~broker() {}
-    virtual int initialize(string params, bool use_logging, bool use_profiling) {return 0; }
-    virtual int connect() {return 0;}
-    virtual int requiresIndicesList() {return 0;}
-    virtual int setIndicesList(vector<string> il) { return 0;}
-    virtual vector<bvex> getValues() {vector<bvex> v1; return v1; }
-    virtual vector<bpex> getPositions() {vector<bpex> p1; return p1; }
-    virtual string closePos(string dealid) {return "";};
-    virtual string openPos(string epic,string way,int nbc,int stop,int limit) {return "";}
-    
-private:
+int broker::initialize(string broker_params, 
+                               bool use_logging, 
+                               bool use_profiling, 
+                               string mode) {
 
-protected:
-    vector<string> ilist;
-    string username;
-    string password;
-    string api_key;
-    string api_url;
-    int requires_indices_list;
+  return 0;
+}
 
-};
+int broker::connect() {
 
-// the types of the class factories
-typedef broker* create_t();
-typedef void destroy_t(broker*);
+  return 0;
+}
 
-#endif
+int broker::requiresIndicesList() {
+
+  return 0;
+}
+
+int broker::setIndicesList(vector<string> il) { 
+
+  return 0;
+}
+
+vector<bvex> broker::getValues() {
+  vector<bvex> v1; 
+  return v1; 
+}
+
+vector<bpex> broker::getPositions() {
+  vector<bpex> p1; 
+  return p1; 
+}
+
+string broker::closePos(string dealid) {
+
+  return "";
+}
+
+string broker::openPos(string epic,
+                       string way,
+                       int nbc,
+                       int stop,
+                       int limit) {
+  return "";
+}
+
+
+
+
+
+
+
+
+
+

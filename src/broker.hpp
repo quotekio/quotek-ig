@@ -27,42 +27,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <igconnector/broker.hpp>
-#include <assert.h>
-#include <dlfcn.h>
 
-create_t* load_broker(string bname)  {
-  string lib_broker = "lib" + bname + ".so";
-  void* handle = dlopen(lib_broker.c_str(),RTLD_LAZY);
+#ifndef broker_H
+#define broker_H
 
-  if(handle == NULL){
-    cerr << dlerror() << endl;
-    exit(1);
-  }
+#include <vector>
+#include <string>
+#include <iostream>
+#include "brokerio.h"
 
-  create_t* create_broker = (create_t*) dlsym(handle, "create");
-  const char* dlsym_error = dlerror();
-    if (dlsym_error) {
-        cerr << "Cannot load symbol create: " << dlsym_error << endl;
-        exit(1);
-  }
-  return create_broker;
-}
+using namespace std;
 
-broker* get_broker() {
-  broker* b = load_broker("igconnector3")();  
-  return b;
-}
+class broker {
 
-int main(int argc, char** argv) {
-  
-  cout << "[TEST BROKER] Connection.." ;
-  broker* b = get_broker();
-  b->initialize(argv[1], false, false,"pull");
-  assert( b->connect() == 0 ) ;
+public:
+    broker();
+    virtual ~broker();
+    virtual int initialize(string, bool, bool, string);
+    virtual int connect();
+    virtual int requiresIndicesList();
+    virtual int setIndicesList(vector<string>);
+    virtual vector<bvex> getValues();
+    virtual vector<bpex> getPositions();
+    virtual string closePos(string);
+    virtual string openPos(string, string, int ,int ,int);
+    
+private:
 
-  cout << "[OK]" << endl;
+protected:
+    vector<string> ilist;
+    string username;
+    string password;
+    string api_key;
+    string api_url;
+    int requires_indices_list;
 
+};
 
-}
+// the types of the class factories
+typedef broker* create_t();
+typedef void destroy_t(broker*);
 
+#endif

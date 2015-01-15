@@ -63,3 +63,13 @@ std::string json_escape(const std::string& input) {
     }
     return ss.str();
 }
+
+size_t curl_write_handler(void *ptr, size_t size, size_t nmemb, std::string stream)
+{
+    if (ptr != NULL) {
+
+      std::string temp(static_cast<const char*>(ptr), size * nmemb);
+      stream += temp;
+    }
+    return size*nmemb;
+}

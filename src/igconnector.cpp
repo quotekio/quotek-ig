@@ -27,39 +27,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "broker.h"
-#include "assoc.h"
-#include "utils.h"
+#include "igconnector.hpp"
 
-#include <curl/curl.h>
-#include "rapidjson/rapidjson.h"
-#include "rapidjson/document.h"
-#include <stdlib.h>
-#include <pthread.h>
-#include "lsclient/lsclient.h"
+igConnector::igConnector() : broker() {
 
-
-#define MAX_UPTIME 42000
-
-size_t curl_wh(void *ptr, size_t size, size_t nmemb, string stream)
-{
-    if (ptr != NULL) {
-
-      string temp(static_cast<const char*>(ptr), size * nmemb);
-      stream += temp;
-    }
-    return size*nmemb;
 }
 
-class igConnector : public broker {
-public:
+igConnector::igConnector(string broker_params, 
+                         bool use_logging, 
+                         bool use_profiling, 
+                         string mode) {
 
-    bool requires_indices_list;
+      initialize(broker_params, use_logging, use_profiling, mode);
+}
 
-    virtual int initialize(string params, bool use_logging, bool use_profiling ) {
+int igConnector::initialize(string broker_params, 
+                            bool use_logging, 
+                            bool use_profiling, 
+                            string mode ) {
 
       rapidjson::Document d;
-      d.Parse<0>(params.c_str());
+      d.Parse<0>(broker_params.c_str());
 
       username = d["username"].GetString();
       password = d["password"].GetString();
@@ -75,17 +63,17 @@ public:
       return 0;
     }
 
-    virtual int requiresIndicesList() {
-      return requires_indices_list;
-    }
+int igConnector::requiresIndicesList() {
+  return requires_indices_list;
+}
 
-    virtual int setIndicesList(vector<string> il) {
+int igConnector::setIndicesList(vector<string> il) {
       ilist = il;
       return 0;
-    }
+}
   
-    virtual int connect() {
-      
+int igConnector::connect() {
+
       cst = "";
       security_token = "";
 
@@ -111,9 +99,9 @@ public:
       curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
       curl_easy_setopt(ch,CURLOPT_POST,1);
       curl_easy_setopt(ch,CURLOPT_POSTFIELDS, pdata.c_str());
-      curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_wh);
+      curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
       curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
-      curl_easy_setopt(ch,CURLOPT_HEADERFUNCTION,curl_wh);
+      curl_easy_setopt(ch,CURLOPT_HEADERFUNCTION,curl_write_handler);
       curl_easy_setopt(ch,CURLOPT_HEADERDATA,&htemp);
 
       curl_easy_perform(ch);
@@ -154,8 +142,7 @@ public:
       return 0;
     }
 
-
-    virtual vector<bvex> getValues() {
+vector<bvex> igConnector::getValues() {
    
       vector<bvex> result;
 
@@ -175,7 +162,7 @@ public:
       CURL* ch = curl_easy_init();
       curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
       curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
-      curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_wh);
+      curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
       curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
       curl_easy_perform(ch);
       curl_easy_cleanup(ch);
@@ -201,8 +188,8 @@ public:
       return result;
     }
 
-    virtual vector<bpex> getPositions() {
-    
+vector<bpex> igConnector::getPositions() {
+
       vector<bpex> result;
 
       string temp = "";
@@ -214,7 +201,7 @@ public:
       headers = addHeaders();
 
       curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
-      curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_wh);
+      curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
       curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
       curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
       curl_easy_perform(ch);
@@ -267,7 +254,7 @@ public:
   }
     
 
-  virtual string openPos(string epic,string way,int nbc,int stop,int limit) {
+string igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
 
     string temp = "";
     string pdata = "";
@@ -315,7 +302,7 @@ public:
     pdata += "}"; 
 
     curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
-    curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_wh);
+    curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
     curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
     curl_easy_setopt(ch,CURLOPT_POST, 1);
@@ -335,8 +322,7 @@ public:
 
   }
 
-
-  virtual string closePos(string dealid) {
+string igConnector::closePos(string dealid) {
   
     string temp = "";
     string c_url = api_url + "/gateway/deal/positions/otc" ;
@@ -372,7 +358,7 @@ public:
 
     CURL* ch = curl_easy_init();
     curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
-    curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_wh);
+    curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
     curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
     //hack IG DELETE with body Issue
@@ -393,19 +379,9 @@ public:
     else if (! d["errorCode"].IsNull()) res = std::string("ERROR:") + d["errorCode"].GetString();
     return res;
 
-  }
+}
 
-
-private:
-
-  string cst;
-  string security_token;
-  AssocArray<string> currencies_map;
-  vector<bpex> lastpos;
-  int uptime_s;
-  LSClient* ls_client;
-
-  inline curl_slist* addHeaders() {
+curl_slist* igConnector::addHeaders() {
 
     curl_slist* headers = NULL;
 
@@ -420,16 +396,15 @@ private:
   
     return headers;
 
-  }
+}
 
 
-  static void* staticUptimeLoop(void* p) {
+void* igConnector::staticUptimeLoop(void* p) {
     static_cast<igConnector*>(p)->uptimeLoop(NULL);
     return NULL;
-  }
+}
 
-
-  void* uptimeLoop(void*) {
+void* igConnector::uptimeLoop(void*) {
     uptime_s = 0;
     while(1) {
       uptime_s++;
@@ -442,9 +417,9 @@ private:
 
     }
     return NULL;
-  }
+}
 
-  void loadCurrenciesMap() {
+void igConnector::loadCurrenciesMap() {
 
     struct curl_slist *headers = NULL;
     string epics_list = "";
@@ -462,7 +437,7 @@ private:
     CURL* ch = curl_easy_init();
     curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
     curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_wh);
+    curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
     curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
     curl_easy_perform(ch);
     curl_easy_cleanup(ch);
@@ -508,15 +483,5 @@ private:
 
     }
 
-  }
-
-};
-
-// the class factories
-extern "C" broker* create() {
-    return new igConnector();
 }
 
-extern "C" void destroy(broker* p) {
-    delete p;
-}
