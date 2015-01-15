@@ -28,15 +28,15 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "broker.hpp"
-#include "assoc.h"
-#include "utils.h"
+#include "utils.hpp"
+#include "assoc.hpp"
 
 #include <curl/curl.h>
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/document.h"
 #include <stdlib.h>
 #include <pthread.h>
-#include "lsclient/lsclient.h"
+#include "lsclient/lsclient.hpp"
 
 #define MAX_UPTIME 42000
 
@@ -58,7 +58,7 @@ public:
     virtual string closePos(string);
   
 private:
-  
+
   string cst;
   string security_token;
   AssocArray<string> currencies_map;

@@ -23,11 +23,6 @@ add_library(
         src/lsclient/lsclient.cpp
 )
 
-#add_executable(
-#        test_connect
-#        tests/test_connect.cpp
-#)
-
 find_library (PTHREAD pthread) 
 find_library (CURL curl)
 
@@ -39,7 +34,11 @@ target_link_libraries(
 
 install (TARGETS igconnector3 DESTINATION lib)
 install (FILES "src/broker.hpp" DESTINATION include/igconnector/)
-install (FILES "src/brokerio.h" DESTINATION include/igconnector/)
+install (FILES "src/assoc.hpp" DESTINATION include/igconnector/)
+install (FILES "src/utils.hpp" DESTINATION include/igconnector/)
+install (FILES "src/brokerio.hpp" DESTINATION include/igconnector/)
+install (FILES "src/igconnector.hpp" DESTINATION include/igconnector/)
+install (FILES "src/lsclient/lsclient.hpp" DESTINATION include/igconnector/lsclient/)
 
 
 

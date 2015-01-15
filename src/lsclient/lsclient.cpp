@@ -1,4 +1,3 @@
-#include "lsclient.h"
 /*
 This is a Quick'n'Dirty C++ implementation of LightStreamer Client
 Copyright(c) 2015 Clément Gamé.
@@ -27,6 +26,8 @@ AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+#include "lsclient.hpp"
 
 LSClient::LSClient(std::string url, 
     		       std::string username, 
