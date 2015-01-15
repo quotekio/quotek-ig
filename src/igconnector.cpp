@@ -187,7 +187,7 @@ vector<bvex> igConnector::getValues() {
       }
 
       return result;
-    }
+}
 
 vector<bpex> igConnector::getPositions() {
 
@@ -252,7 +252,7 @@ vector<bpex> igConnector::getPositions() {
 
       lastpos = result;
       return result;
-  }
+}
     
 
 string igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
@@ -486,3 +486,11 @@ void igConnector::loadCurrenciesMap() {
 
 }
 
+// the class factories
+extern "C" broker* create() {
+    return new igConnector();
+}
+
+extern "C" void destroy(broker* p) {
+    delete p;
+}

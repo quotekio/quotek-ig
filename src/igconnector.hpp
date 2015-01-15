@@ -26,6 +26,8 @@ AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef IGCONNECTOR_H
+#define IGCONNECTOR_H
 
 #include "broker.hpp"
 #include "utils.hpp"
@@ -72,11 +74,4 @@ private:
   void loadCurrenciesMap();
 };
 
-// the class factories
-extern "C" broker* create() {
-    return new igConnector();
-}
-
-extern "C" void destroy(broker* p) {
-    delete p;
-}
+#endif

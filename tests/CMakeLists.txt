@@ -17,6 +17,7 @@ SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
 add_executable(
         test_connect
         test_connect.cpp
+        fixtures.cpp
 )
 
 target_link_libraries(
