@@ -31,6 +31,11 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int main(int argc, char** argv) {
   
+  if (argc < 2) {
+    cout << "[ERROR] Not enough arguments" << endl;
+    exit(1);
+  }
+
   cout << "[TEST BROKER] Connection.." ;
   igConnector* c = get_igconnector(argv[1]);
   assert(c->connect() == 0); 

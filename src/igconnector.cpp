@@ -55,6 +55,7 @@ int igConnector::initialize(string broker_params,
       api_key = d["api_key"].GetString();
       api_url = d["api_url"].GetString();
 
+      connector_mode = mode;
       requires_indices_list = true;
 
       //creates uptime loop, to reconnect when IG session expires.
@@ -112,10 +113,8 @@ int igConnector::connect() {
       rapidjson::Document d;
 
       d.Parse<0>(temp.c_str());
-      if (d.HasParseError() ) {
-        
+      if (d.HasParseError() ) {        
         return 1;
-        cout << "PARSE ERROR" << endl;
       }
      
       vector<string> hdata = split(htemp,'\n');
@@ -133,12 +132,13 @@ int igConnector::connect() {
       }
 
       if ( cst == "" || security_token == "") {
-        cout << "NO TOKEN" << endl;
         return 1;
       }
 
       //loads currencies map right after connect
       loadCurrenciesMap();
+
+      
 
       return 0;
     }

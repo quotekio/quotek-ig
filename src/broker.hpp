@@ -60,6 +60,7 @@ protected:
     string password;
     string api_key;
     string api_url;
+    string connector_mode;
     int requires_indices_list;
 
 };
