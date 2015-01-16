@@ -29,6 +29,7 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <string>
+#include "lssubscription.hpp"
 
 class LSClient {
 
@@ -36,17 +37,19 @@ class LSClient {
 
     LSClient(std::string url, 
     		     std::string username, 
-    		     std::string password, 
-    		     std::vector<std::string>* subscribtions);
+    		     std::string password);
 
     int connect();
+    int addSubscription(LSSubscription*);
+    int remSubscription(std::string);
+
     void* receive_loop(void*);
 
   private:
 
-  	std::string ls_url;
+  	std::string ls_endpoint;
   	std::string ls_username;
   	std::string ls_password;
-  	std::vector<std::string>* ls_subscribtions;
+  	std::vector<LSSubscription*> ls_subscribtions;
 
 };

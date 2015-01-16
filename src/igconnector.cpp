@@ -50,6 +50,10 @@ int igConnector::initialize(string broker_params,
       rapidjson::Document d;
       d.Parse<0>(broker_params.c_str());
 
+      if (d.HasParseError() ) {  
+        return 1;
+      }
+      
       username = d["username"].GetString();
       password = d["password"].GetString();
       api_key = d["api_key"].GetString();
@@ -117,6 +121,10 @@ int igConnector::connect() {
         return 1;
       }
      
+      ls_endpoint = d["lightstreamerEndpoint"].GetString();
+      cout << ls_endpoint << endl;
+    
+
       vector<string> hdata = split(htemp,'\n');
 
       for (int i=0;i<hdata.size();i++) {
@@ -138,10 +146,17 @@ int igConnector::connect() {
       //loads currencies map right after connect
       loadCurrenciesMap();
 
-      
-
       return 0;
     }
+
+
+int igConnector::LSSetSubscribtions(vector<string> subscribtions) {
+
+}
+
+int igConnector::LSConnect() {
+   ls_client = new LSClient(ls_endpoint, username, password, ls_subscribtions );
+}
 
 vector<bvex> igConnector::getValues() {
    

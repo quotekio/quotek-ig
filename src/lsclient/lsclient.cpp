@@ -34,7 +34,7 @@ LSClient::LSClient(std::string url,
     		       std::string password, 
     		       std::vector<std::string>* subscribtions) {
 
-  ls_url = url;
+  ls_endpoint = url;
   ls_username = username;
   ls_password = password;
   ls_subscribtions = subscribtions;
@@ -43,7 +43,18 @@ LSClient::LSClient(std::string url,
 
 int LSClient::connect() {
 
+}
 
+int LSClient::addSubscription(LSSubscription* s) {
+	ls_subscriptions.push_back(s);
+}
+int LSClient::remSubscription(std::string object_id) {
+
+  for(int i=0;i<ls_subscriptions.size();i++) {
+    if ls_subscriptions[i]->getObjectId() == object_id {
+      //delete vector entry
+    }
+  }
 }
 
 

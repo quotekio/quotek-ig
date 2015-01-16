@@ -58,7 +58,9 @@ public:
     virtual vector<bpex> getPositions();
     virtual string openPos(string,string,int,int,int);
     virtual string closePos(string);
-  
+
+    int LSConnect();
+
 private:
 
   string cst;
@@ -67,6 +69,8 @@ private:
   vector<bpex> lastpos;
   int uptime_s;
   LSClient* ls_client;
+  string ls_endpoint;
+  vector<string> ls_subscriptions;
 
   inline curl_slist* addHeaders();
   static void* staticUptimeLoop(void* p);

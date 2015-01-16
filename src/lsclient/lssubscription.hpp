@@ -1,7 +1,5 @@
-#include "fixtures.hpp"
-
 /*
-IG api C++ Connector v1.0
+This is a Quick'n'Dirty C++ implementation of LightStreamer Client
 Copyright(c) 2015 Clément Gamé.
 
 All rights reserved.
@@ -29,18 +27,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fixtures.hpp"
+#include <string>
+#include <vector>
 
-int main(int argc, char** argv) {
-  
-  if (argc < 2) {
-    cout << "[ERROR] Not enough arguments" << endl;
-    exit(1);
-  }
+class LSSubscription {
 
-  cout << "[TEST BROKER] LSClient Connection.." ;
-  igConnector* c = get_igconnector(argv[1]);
-  assert(c->connect() == 0); 
-  cout << "[OK]" << endl;
+  public:
+  	LSSubscription(std::string, std::string, std::vector<std::string>);
+  	std::string getItemType();
+  	std::string getObjectId();
+  	std::vector<std::string> getFields();
+  protected:
+  	std::string item_type;
+  	std::string object_id;
+  	std::vector<std::string> fields;
+};
 
-}
