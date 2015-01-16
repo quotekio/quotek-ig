@@ -11,6 +11,9 @@ class http {
   private:
   	CURL* ch;
   	struct curl_slist *headers;
+    size_t (*write_cb)(void*,size_t,size_t, void*);
+    void* write_data;
+
   public:
   	http();
   	void destroy();
@@ -19,7 +22,10 @@ class http {
   	std::string post(std::string,std::string);
   	std::string post(std::string url,AssocArray<std::string> post_data);
   	std::string del(std::string url);
-    
+    CURL* get_curl_handler();
+    void set_write_callback(size_t (*write_c)(void*,size_t,size_t, void*));
+    void set_write_data(void*);
+
 };
 
 #endif

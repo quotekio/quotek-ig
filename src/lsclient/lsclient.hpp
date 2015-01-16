@@ -30,6 +30,7 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 #include "lssubscription.hpp"
+#include "../utils.hpp"
 
 class LSClient {
 
@@ -43,13 +44,18 @@ class LSClient {
     int addSubscription(LSSubscription*);
     int remSubscription(std::string);
 
-    void* receive_loop(void*);
+    static size_t streamCallbackWrapper(void*, size_t, size_t, void*);
 
+    void setSessionId(std::string);
+    void setControlEndpoint(std::string);
+    
   private:
-
+    
   	std::string ls_endpoint;
+    std::string ls_control_endpoint;
   	std::string ls_username;
   	std::string ls_password;
+    std::string ls_session_id;
   	std::vector<LSSubscription*> ls_subscriptions;
 
 };

@@ -114,8 +114,6 @@ int igConnector::connect() {
       curl_easy_cleanup(ch);
       curl_slist_free_all(headers);
 
-      cout << temp << endl;
-
       rapidjson::Document d;
 
       d.Parse<0>(temp.c_str());
@@ -124,8 +122,7 @@ int igConnector::connect() {
       }
      
       ls_endpoint = d["lightstreamerEndpoint"].GetString();
-      cout << ls_endpoint << endl;
-    
+      client_id = d["clientId"].GetString();
 
       vector<string> hdata = split(htemp,'\n');
 
@@ -171,7 +168,7 @@ int igConnector::LSConnect() {
 
    std::string ls_password;
    ls_password = ncst + "|" + xst;
-   ls_client = new LSClient(ls_endpoint, username, ls_password);
+   ls_client = new LSClient(ls_endpoint, client_id, ls_password);
    return ls_client->connect();
 }
 

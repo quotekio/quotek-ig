@@ -45,18 +45,47 @@ int LSClient::connect() {
   //creates a new LS session
   http* req = new http();
   AssocArray<string> pdata;
-  pdata["LS_user"] = ls_username;
+  pdata["LS_user"] = ls_username ;
   pdata["LS_password"] = ls_password ;
-  pdata["LS_adapter_set"] = "DEFAULT";
-  
-
+    
   std::string create_session_url = ls_endpoint + "/lightstreamer/create_session.txt";  
-  std::string foo = req->post(create_session_url, pdata);
 
-  cout << "ANSWER:" << foo << endl;
+  //sets stream callback
+  req->set_write_callback(LSClient::streamCallbackWrapper);
+  req->set_write_data((void*) this);
+  std::string foo = req->post(create_session_url, pdata);
 
   return 0;
 
+}
+
+size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, void* obj) {
+
+  LSClient* lsc = static_cast<LSClient*>(obj);
+  
+  if (ptr != NULL) {
+      std::string ls_stream(static_cast<const char*>(ptr), size * nmemb);
+      cout << "TEMP:" << ls_stream << endl;
+      vector<std::string> resdata = split(ls_stream,'\n');
+
+      if (  resdata[0] == "OK" ) {
+        cout << "LSCLIENT CONNECTED!" << endl;
+      }
+
+
+
+      }
+
+    return size*nmemb;
+}
+
+
+void LSClient::setSessionId(std::string sessid) {
+  ls_session_id = sessid;
+}
+
+void LSClient::setControlEndpoint(std::string ctl_endpoint) {
+  ls_control_endpoint = ctl_endpoint;
 }
 
 int LSClient::addSubscription(LSSubscription* s) {

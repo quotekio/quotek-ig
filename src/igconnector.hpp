@@ -65,6 +65,7 @@ private:
 
   string cst;
   string security_token;
+  string client_id;
   AssocArray<string> currencies_map;
   vector<bpex> lastpos;
   int uptime_s;
