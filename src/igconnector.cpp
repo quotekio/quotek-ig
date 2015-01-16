@@ -150,12 +150,15 @@ int igConnector::connect() {
     }
 
 
-int igConnector::LSSetSubscribtions(vector<string> subscribtions) {
+/*
+int igConnector::LSSetSubscribtions(vector<string>* subscribtions) {
 
 }
+*/
 
 int igConnector::LSConnect() {
-   ls_client = new LSClient(ls_endpoint, username, password, ls_subscribtions );
+   ls_client = new LSClient(ls_endpoint, username, password);
+   return ls_client->connect();
 }
 
 vector<bvex> igConnector::getValues() {

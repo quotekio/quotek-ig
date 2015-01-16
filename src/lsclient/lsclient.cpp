@@ -28,33 +28,48 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "lsclient.hpp"
+#include "http.hpp"
 
 LSClient::LSClient(std::string url, 
     		       std::string username, 
-    		       std::string password, 
-    		       std::vector<std::string>* subscribtions) {
+    		       std::string password) {
 
   ls_endpoint = url;
   ls_username = username;
   ls_password = password;
-  ls_subscribtions = subscribtions;
-
+  
 }
 
 int LSClient::connect() {
+
+  //creates a new LS session
+  http* req = new http();
+  AssocArray<string> pdata;
+  pdata["LS_USERNAME"] = ls_username;
+  pdata["LS_PASSWORD"] = ls_password;
+
+  std::string create_session_url = ls_endpoint + "/lightstreamer/create_session.txt";  
+  std::string foo = req->post(create_session_url, pdata);
+  
+  cout << foo << endl;
+
+  return 0;
 
 }
 
 int LSClient::addSubscription(LSSubscription* s) {
 	ls_subscriptions.push_back(s);
+	return 0;
 }
 int LSClient::remSubscription(std::string object_id) {
 
   for(int i=0;i<ls_subscriptions.size();i++) {
-    if ls_subscriptions[i]->getObjectId() == object_id {
+    if (ls_subscriptions[i]->getObjectId() == object_id) {
       //delete vector entry
     }
   }
+
+  return 0;
 }
 
 

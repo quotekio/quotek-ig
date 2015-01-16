@@ -50,6 +50,6 @@ class LSClient {
   	std::string ls_endpoint;
   	std::string ls_username;
   	std::string ls_password;
-  	std::vector<LSSubscription*> ls_subscribtions;
+  	std::vector<LSSubscription*> ls_subscriptions;
 
 };

@@ -1,4 +1,4 @@
-#include "lssubscription.h"
+#include "lssubscription.hpp"
 
 LSSubscription::LSSubscription(std::string item_t, std::string obj_id, std::vector<std::string> flist) {
   item_type = item_t;
@@ -14,6 +14,6 @@ std::string LSSubscription::getObjectId(){
   return object_id;
 }
 
-std::vector<std::string> getFields(){
+std::vector<std::string> LSSubscription::getFields(){
   return fields;
 }

@@ -40,7 +40,10 @@ int main(int argc, char** argv) {
 
   cout << "[TEST BROKER] LSClient Connection.." ;
   igConnector* c = get_igconnector(argv[1]);
+  
   assert(c->connect() == 0); 
+  assert(c->LSConnect() == 0);
+
   cout << "[OK]" << endl;
 
 }

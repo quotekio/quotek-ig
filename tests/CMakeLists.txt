@@ -20,10 +20,21 @@ add_executable(
         fixtures.cpp
 )
 
+add_executable(
+        test_lsclient_connect
+        test_lsclient_connect.cpp
+        fixtures.cpp
+)
+
+
 target_link_libraries(
   test_connect
   igconnector3
-  dl
+)
+
+target_link_libraries(
+  test_lsclient_connect
+  igconnector3
 )
 
 
