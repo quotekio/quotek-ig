@@ -45,13 +45,15 @@ int LSClient::connect() {
   //creates a new LS session
   http* req = new http();
   AssocArray<string> pdata;
-  pdata["LS_USERNAME"] = ls_username;
-  pdata["LS_PASSWORD"] = ls_password;
+  pdata["LS_user"] = ls_username;
+  pdata["LS_password"] = ls_password ;
+  pdata["LS_adapter_set"] = "DEFAULT";
+  
 
   std::string create_session_url = ls_endpoint + "/lightstreamer/create_session.txt";  
   std::string foo = req->post(create_session_url, pdata);
-  
-  cout << foo << endl;
+
+  cout << "ANSWER:" << foo << endl;
 
   return 0;
 

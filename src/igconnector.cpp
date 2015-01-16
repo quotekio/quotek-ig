@@ -114,6 +114,8 @@ int igConnector::connect() {
       curl_easy_cleanup(ch);
       curl_slist_free_all(headers);
 
+      cout << temp << endl;
+
       rapidjson::Document d;
 
       d.Parse<0>(temp.c_str());
@@ -166,7 +168,7 @@ int igConnector::LSConnect() {
 
    sreplace(xst, "X-SECURITY-TOKEN: ", "XST-");
    trim(xst);
-   
+
    std::string ls_password;
    ls_password = ncst + "|" + xst;
    ls_client = new LSClient(ls_endpoint, username, ls_password);
