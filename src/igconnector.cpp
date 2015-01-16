@@ -157,7 +157,19 @@ int igConnector::LSSetSubscribtions(vector<string>* subscribtions) {
 */
 
 int igConnector::LSConnect() {
-   ls_client = new LSClient(ls_endpoint, username, password);
+
+   std::string ncst = cst;
+   std::string xst = security_token;
+
+   sreplace(ncst,"CST: ","CST-");
+   trim(ncst);
+
+   sreplace(xst, "X-SECURITY-TOKEN: ", "XST-");
+   trim(xst);
+   
+   std::string ls_password;
+   ls_password = ncst + "|" + xst;
+   ls_client = new LSClient(ls_endpoint, username, ls_password);
    return ls_client->connect();
 }
 

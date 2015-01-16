@@ -29,6 +29,10 @@ std::string &trim(std::string &s);
 std::string int2string(int i);
 int roundint(double r);
 std::string &upper(std::string &s);
+std::string sreplace(std::string &s,
+                     std::string toReplace,
+                     std::string replaceWith);
+
 
 size_t curl_write_handler(void*, size_t, size_t, std::string stream);
 

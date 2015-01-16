@@ -44,6 +44,18 @@ std::string &upper(std::string &s) {
         return s;
 }
 
+std::string sreplace(std::string &s,
+                      std::string toReplace,
+                      std::string replaceWith) {
+
+    if (s.find(toReplace) != std::string::npos ) {
+      return(s.replace(s.find(toReplace), toReplace.length(), replaceWith));
+    }
+
+    else return s;
+
+}
+
 std::string json_escape(const std::string& input) {
     std::ostringstream ss;
     for (auto iter = input.cbegin(); iter != input.cend(); iter++) {
