@@ -32,13 +32,14 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "broker.hpp"
 #include "utils.hpp"
 #include "assoc.hpp"
+#include "lsclient.hpp"
 
-#include <curl/curl.h>
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/document.h"
+
+#include <curl/curl.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include "lsclient/lsclient.hpp"
 
 #define MAX_UPTIME 42000
 

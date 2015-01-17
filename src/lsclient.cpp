@@ -35,9 +35,12 @@ LSClient::LSClient(std::string url,
     		       std::string password) {
 
   ls_endpoint = url;
+  ls_control_endpoint = url;
   ls_username = username;
   ls_password = password;
-  
+
+  status = LS_STATUS_INITIALIZED;
+
 }
 
 int LSClient::connect() {
@@ -66,22 +69,45 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
   if (ptr != NULL) {
       std::string ls_stream(static_cast<const char*>(ptr), size * nmemb);
       cout << "TEMP:" << ls_stream << endl;
-      vector<std::string> resdata = split(ls_stream,'\n');
+      std::vector<std::string> resdata = split(ls_stream,'\n');
+
+      for (int i=0;i<resdata.size();i++) {
+        trim(resdata[i]);
+      }
 
       if (  resdata[0] == "OK" ) {
-        cout << "LSCLIENT CONNECTED!" << endl;
+
+        lsc->setStatus(LS_STATUS_CONNECTED);
+        
+        //parse Data
+        for (int i=1;i<resdata.size();i++) {
+          std::vector<std::string> parsed_line = split(resdata[i],':');
+
+          if (parsed_line.size() > 1) {
+            if (parsed_line[0] == "SessionId") {
+              lsc->setSessionId(parsed_line[1]);
+            }
+            else if (parsed_line[0] == "ControlAddress") {
+              lsc->setControlEndpoint(parsed_line[1]);
+            } 
+          }
+        }
       }
 
-
-
-      }
-
+    }
     return size*nmemb;
 }
 
-
 void LSClient::setSessionId(std::string sessid) {
   ls_session_id = sessid;
+}
+
+uint8_t LSClient::getStatus()  {
+  return status;
+}
+
+void LSClient::setStatus(uint8_t st) {
+  status = st;
 }
 
 void LSClient::setControlEndpoint(std::string ctl_endpoint) {

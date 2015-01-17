@@ -30,7 +30,11 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 #include "lssubscription.hpp"
-#include "../utils.hpp"
+#include "utils.hpp"
+
+#define LS_STATUS_INITIALIZED 0x01
+#define LS_STATUS_CONNECTED 0x02
+#define LS_STATUS_RECEIVING 0x03
 
 class LSClient {
 
@@ -41,6 +45,8 @@ class LSClient {
     		     std::string password);
 
     int connect();
+    void setStatus(uint8_t);
+    uint8_t getStatus();
     int addSubscription(LSSubscription*);
     int remSubscription(std::string);
 
@@ -57,5 +63,7 @@ class LSClient {
   	std::string ls_password;
     std::string ls_session_id;
   	std::vector<LSSubscription*> ls_subscriptions;
+    uint8_t status;
+
 
 };

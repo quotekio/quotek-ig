@@ -20,9 +20,9 @@ add_library(
         src/broker.cpp
         src/igconnector.cpp
         src/utils.cpp
-        src/lsclient/lsclient.cpp
-        src/lsclient/lssubscription.cpp
-        src/lsclient/http.cpp
+        src/lsclient.cpp
+        src/lssubscription.cpp
+        src/http.cpp
 )
 
 find_library (PTHREAD pthread) 
@@ -40,7 +40,7 @@ install (FILES "src/assoc.hpp" DESTINATION include/igconnector/)
 install (FILES "src/utils.hpp" DESTINATION include/igconnector/)
 install (FILES "src/brokerio.hpp" DESTINATION include/igconnector/)
 install (FILES "src/igconnector.hpp" DESTINATION include/igconnector/)
-install (FILES "src/lsclient/lsclient.hpp" DESTINATION include/igconnector/lsclient/)
-install (FILES "src/lsclient/lssubscription.hpp" DESTINATION include/igconnector/lsclient/)
+install (FILES "src/lsclient.hpp" DESTINATION include/igconnector/lsclient/)
+install (FILES "src/lssubscription.hpp" DESTINATION include/igconnector/lsclient/)
 install (DIRECTORY "src/rapidjson" DESTINATION include/igconnector/)
 
