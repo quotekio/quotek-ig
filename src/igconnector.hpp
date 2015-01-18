@@ -60,7 +60,8 @@ public:
     virtual string openPos(string,string,int,int,int);
     virtual string closePos(string);
 
-    int LSConnect();
+    int LSStart();
+    LSClient* getLSClient();
 
 private:
 

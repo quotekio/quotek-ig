@@ -29,6 +29,7 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <string>
+#include <pthread.h>
 #include "lssubscription.hpp"
 #include "utils.hpp"
 
@@ -36,22 +37,29 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define LS_STATUS_CONNECTED 0x02
 #define LS_STATUS_RECEIVING 0x03
 
+#define LS_STATUS_CONNECT_ERROR 0x40
+
 class LSClient {
 
   public:
 
+    //constructor
     LSClient(std::string url, 
     		     std::string username, 
     		     std::string password);
 
+
+    void start();
     int connect();
-    void setStatus(uint8_t);
-    uint8_t getStatus();
+    void setStatus(int);
+    int getStatus();
     int addSubscription(LSSubscription*);
     int remSubscription(std::string);
 
+    //callback wrappers
     static size_t streamCallbackWrapper(void*, size_t, size_t, void*);
-
+    static void* streamThreadWrapper(void*);
+    
     void setSessionId(std::string);
     void setControlEndpoint(std::string);
     
@@ -63,7 +71,8 @@ class LSClient {
   	std::string ls_password;
     std::string ls_session_id;
   	std::vector<LSSubscription*> ls_subscriptions;
-    uint8_t status;
+    int ls_status;
+    pthread_t stream_thread;
 
 
 };

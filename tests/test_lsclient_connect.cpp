@@ -42,8 +42,24 @@ int main(int argc, char** argv) {
   igConnector* c = get_igconnector(argv[1]);
   
   assert(c->connect() == 0); 
-  assert(c->LSConnect() == 0);
+  assert(c->LSStart() == 0);
+  LSClient* lsc = c->getLSClient();
 
-  cout << "[OK]" << endl;
+  int ctimeout = 10;
+  int i=0;
+  while(i < ctimeout)  {
+    
+    if ( lsc->getStatus() == LS_STATUS_CONNECTED ) {
+      cout << "[OK]" << endl;
+      exit(0);
+    }
+
+    i++;
+    sleep(1);
+  }
+
+  cout << "[ERROR]" << endl;
+  exit(1);
+
 
 }

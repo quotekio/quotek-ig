@@ -39,8 +39,17 @@ LSClient::LSClient(std::string url,
   ls_username = username;
   ls_password = password;
 
-  status = LS_STATUS_INITIALIZED;
+  ls_status = LS_STATUS_INITIALIZED;
 
+}
+
+void LSClient::start()  {
+  pthread_create(&stream_thread, NULL, LSClient::streamThreadWrapper, this);
+}
+
+void* LSClient::streamThreadWrapper(void* lsc) {
+  static_cast<LSClient*>(lsc)->connect();
+  return NULL;
 }
 
 int LSClient::connect() {
@@ -54,10 +63,13 @@ int LSClient::connect() {
   std::string create_session_url = ls_endpoint + "/lightstreamer/create_session.txt";  
 
   //sets stream callback
-  req->set_write_callback(LSClient::streamCallbackWrapper);
-  req->set_write_data((void*) this);
-  std::string foo = req->post(create_session_url, pdata);
+  CURL* ch = req->get_curl_handler();
+  curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,&LSClient::streamCallbackWrapper);
 
+  req->set_write_callback(&LSClient::streamCallbackWrapper);
+  req->set_write_data(this);
+  req->post(create_session_url, pdata);
+  
   return 0;
 
 }
@@ -65,20 +77,16 @@ int LSClient::connect() {
 size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, void* obj) {
 
   LSClient* lsc = static_cast<LSClient*>(obj);
-  
+
   if (ptr != NULL) {
       std::string ls_stream(static_cast<const char*>(ptr), size * nmemb);
-      cout << "TEMP:" << ls_stream << endl;
       std::vector<std::string> resdata = split(ls_stream,'\n');
-
       for (int i=0;i<resdata.size();i++) {
         trim(resdata[i]);
       }
 
       if (  resdata[0] == "OK" ) {
-
         lsc->setStatus(LS_STATUS_CONNECTED);
-        
         //parse Data
         for (int i=1;i<resdata.size();i++) {
           std::vector<std::string> parsed_line = split(resdata[i],':');
@@ -102,12 +110,12 @@ void LSClient::setSessionId(std::string sessid) {
   ls_session_id = sessid;
 }
 
-uint8_t LSClient::getStatus()  {
-  return status;
+int LSClient::getStatus()  {
+  return ls_status;
 }
 
-void LSClient::setStatus(uint8_t st) {
-  status = st;
+void LSClient::setStatus(int st) {
+  ls_status = st;
 }
 
 void LSClient::setControlEndpoint(std::string ctl_endpoint) {

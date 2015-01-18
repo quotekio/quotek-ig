@@ -21,6 +21,7 @@ class http {
   	std::string get(std::string url);
   	std::string post(std::string,std::string);
   	std::string post(std::string url,AssocArray<std::string> post_data);
+    void post2(std::string url,AssocArray<std::string> post_data);
   	std::string del(std::string url);
     CURL* get_curl_handler();
     void set_write_callback(size_t (*write_c)(void*,size_t,size_t, void*));

@@ -155,7 +155,7 @@ int igConnector::LSSetSubscribtions(vector<string>* subscribtions) {
 }
 */
 
-int igConnector::LSConnect() {
+int igConnector::LSStart() {
 
    std::string ncst = cst;
    std::string xst = security_token;
@@ -169,7 +169,14 @@ int igConnector::LSConnect() {
    std::string ls_password;
    ls_password = ncst + "|" + xst;
    ls_client = new LSClient(ls_endpoint, client_id, ls_password);
-   return ls_client->connect();
+   ls_client->start();
+   
+   return 0;
+
+}
+
+LSClient* igConnector::getLSClient() {
+  return ls_client;
 }
 
 vector<bvex> igConnector::getValues() {

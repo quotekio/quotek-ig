@@ -26,6 +26,12 @@ add_executable(
         fixtures.cpp
 )
 
+add_executable(
+        test_lsclient_subscribe
+        test_lsclient_subscribe.cpp
+        fixtures.cpp
+)
+
 
 target_link_libraries(
   test_connect
@@ -37,6 +43,9 @@ target_link_libraries(
   igconnector3
 )
 
-
+target_link_libraries(
+  test_lsclient_subscribe
+  igconnector3
+)
 
 

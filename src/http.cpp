@@ -97,6 +97,26 @@ std::string http::post(std::string url, AssocArray<std::string> post_data) {
 
 }
 
+void http::post2(std::string url, AssocArray<std::string> post_data) {
+
+  std::string wpost = "";
+
+  for(int i=0;i<post_data.Size();i++) {
+    wpost = post_data.GetItemName(i) + "=" + post_data[i];
+    if (i != post_data.Size() -1) wpost += "&";
+  }
+
+  curl_easy_setopt(ch,CURLOPT_URL,url.c_str());
+  curl_easy_setopt(ch,CURLOPT_POST,1);
+  curl_easy_setopt(ch,CURLOPT_POSTFIELDS,wpost.c_str());
+  curl_easy_setopt(ch,CURLOPT_HTTPHEADER,headers);
+  curl_easy_perform(ch);
+
+}
+
+
+
+
 std::string http::del(std::string url) {
 
   std::string wdata = "";
