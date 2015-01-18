@@ -31,6 +31,7 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fixtures.hpp"
 
+
 int main(int argc, char** argv) {
   
   if (argc < 2) {
@@ -62,6 +63,22 @@ int main(int argc, char** argv) {
   if (!connected) {
     cout << "[ERROR]" << endl;
     exit(1);
+  }
+
+  std::vector<std::string> itemlist;
+  itemlist.push_back("MARKET:IX.D.CAC.IMF.IP");
+
+  std::vector<std::string> fields;
+  fields.push_back("BID");
+  fields.push_back("OFFER");
+
+  LSSubscription *s1 = new LSSubscription("MARKET", itemlist, fields);
+
+  lsc->addSubscription(s1);
+  lsc->subscribeAll();
+
+  while(1) {
+    sleep(1);
   }
 
 }
