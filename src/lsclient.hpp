@@ -55,6 +55,7 @@ class LSClient {
     int getStatus();
     int addSubscription(LSSubscription*);
     int remSubscription(std::string);
+    int subscribeAll();
 
     //callback wrappers
     static size_t streamCallbackWrapper(void*, size_t, size_t, void*);

@@ -33,13 +33,13 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class LSSubscription {
 
   public:
-  	LSSubscription(std::string, std::string, std::vector<std::string>);
+  	LSSubscription(std::string, std::vector<std::string>, std::vector<std::string>);
   	std::string getItemType();
-  	std::string getObjectId();
+  	std::vector<std::string> getObjectIds();
   	std::vector<std::string> getFields();
   protected:
   	std::string item_type;
-  	std::string object_id;
+  	std::vector<std::string> object_ids;
   	std::vector<std::string> fields;
 };
 

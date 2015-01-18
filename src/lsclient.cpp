@@ -64,15 +64,51 @@ int LSClient::connect() {
 
   //sets stream callback
   CURL* ch = req->get_curl_handler();
-  curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,&LSClient::streamCallbackWrapper);
+  curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, &LSClient::streamCallbackWrapper);
+  curl_easy_setopt(ch,CURLOPT_WRITEDATA, this);
+  req->post2(create_session_url, pdata);
 
-  req->set_write_callback(&LSClient::streamCallbackWrapper);
-  req->set_write_data(this);
-  req->post(create_session_url, pdata);
-  
   return 0;
 
 }
+
+int LSClient::subscribeAll() {
+
+  cout << "SUBSCRIBING ALL!" << endl;
+
+  std::string subscribe_url = ( ls_control_endpoint.find("https://") == std::string::npos ) ? "https://" : "" ;
+  subscribe_url += ls_control_endpoint + "/lightstreamer/control.txt";
+
+  for (int i=0;i< ls_subscriptions.size() ;i++) {
+
+    http* req2 = new http();
+
+    AssocArray<std::string> pdata;
+    pdata["LS_session"] = ls_session_id;
+    pdata["LS_op"] = "add";
+    pdata["LS_table"] = "2";
+    pdata["LS_schema"] = "";
+    pdata["LS_id"] = "";
+    pdata["LS_mode"] = "MERGE";
+
+    for (int j=0;j< ls_subscriptions[i]->getFields().size();j++ ) {
+      pdata["LS_schema"] += ls_subscriptions[i]->getFields()[j];
+      pdata["LS_schema"] += "+";
+    }
+
+    for (int j=0;j< ls_subscriptions[i]->getObjectIds().size();j++ ) {
+      pdata["LS_id"] += ls_subscriptions[i]->getObjectIds()[j];
+      pdata["LS_id"] += "+";
+    }
+    
+    req2->post(subscribe_url, pdata);
+
+  }
+
+  return 0;
+
+}
+
 
 size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, void* obj) {
 
@@ -80,6 +116,9 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
 
   if (ptr != NULL) {
       std::string ls_stream(static_cast<const char*>(ptr), size * nmemb);
+
+      if (lsc->getStatus() == LS_STATUS_CONNECTED) cout << ls_stream << endl;
+
       std::vector<std::string> resdata = split(ls_stream,'\n');
       for (int i=0;i<resdata.size();i++) {
         trim(resdata[i]);
@@ -127,15 +166,9 @@ int LSClient::addSubscription(LSSubscription* s) {
 	return 0;
 }
 int LSClient::remSubscription(std::string object_id) {
-
-  for(int i=0;i<ls_subscriptions.size();i++) {
-    if (ls_subscriptions[i]->getObjectId() == object_id) {
-      //delete vector entry
-    }
-  }
-
   return 0;
 }
+
 
 
 

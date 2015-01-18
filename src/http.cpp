@@ -19,15 +19,6 @@ CURL* http::get_curl_handler()  {
   return ch;
 }
 
-void http::set_write_callback(size_t (*write_c)(void*,size_t,size_t, void*) ) {
-  write_cb  = write_c;
-}
-
-void http::set_write_data(void* wdata) {
-  write_data = wdata;
-}
-
-
 http::http() {
   ch = curl_easy_init();
   headers = NULL;
@@ -60,10 +51,9 @@ std::string http::get(std::string url) {
 std::string http::post(std::string url,std::string pdata) {
 
   std::string wdata = "";
-  write_data = &wdata;
   curl_easy_setopt(ch,CURLOPT_URL,url.c_str());
-  curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,write_cb);
-  curl_easy_setopt(ch,CURLOPT_WRITEDATA,write_data);
+  curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_writehandle);
+  curl_easy_setopt(ch,CURLOPT_WRITEDATA,&wdata);
   curl_easy_setopt(ch,CURLOPT_POST,1);
   curl_easy_setopt(ch,CURLOPT_POSTFIELDS,pdata.c_str());
   curl_easy_setopt(ch,CURLOPT_HTTPHEADER,headers);
@@ -77,17 +67,16 @@ std::string http::post(std::string url,std::string pdata) {
 std::string http::post(std::string url, AssocArray<std::string> post_data) {
 
   std::string wdata = "";
-  write_data = &wdata;
   std::string wpost = "";
 
   for(int i=0;i<post_data.Size();i++) {
-    wpost = post_data.GetItemName(i) + "=" + post_data[i];
+    wpost += post_data.GetItemName(i) + "=" + post_data[i];
     if (i != post_data.Size() -1) wpost += "&";
   }
 
   curl_easy_setopt(ch,CURLOPT_URL,url.c_str());
-  curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,write_cb);
-  curl_easy_setopt(ch,CURLOPT_WRITEDATA,write_data);
+  curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_writehandle);
+  curl_easy_setopt(ch,CURLOPT_WRITEDATA,&wdata);
   curl_easy_setopt(ch,CURLOPT_POST,1);
   curl_easy_setopt(ch,CURLOPT_POSTFIELDS,wpost.c_str());
   curl_easy_setopt(ch,CURLOPT_HTTPHEADER,headers);
@@ -102,7 +91,7 @@ void http::post2(std::string url, AssocArray<std::string> post_data) {
   std::string wpost = "";
 
   for(int i=0;i<post_data.Size();i++) {
-    wpost = post_data.GetItemName(i) + "=" + post_data[i];
+    wpost += post_data.GetItemName(i) + "=" + post_data[i];
     if (i != post_data.Size() -1) wpost += "&";
   }
 
