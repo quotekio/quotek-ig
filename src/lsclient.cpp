@@ -134,7 +134,7 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
           int index = atoi( values[0].c_str() );
 
           for (int k=1;k< values.size();k++ )  {
-            lsdata->at(index-1)[k] = values[k];
+            lsdata->at(index-1)[k-1] = values[k];
           }
 
         } 

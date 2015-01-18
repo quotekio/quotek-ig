@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     exit(1);
   }
 
-  cout << "[TEST BROKER] LSClient Subscribe.." ;
+  cout << "[TEST BROKER] LSClient getdata.." ;
   igConnector* c = get_igconnector(argv[1]);
   
   assert(c->connect() == 0); 
@@ -83,18 +83,18 @@ int main(int argc, char** argv) {
 
   sleep(10);
 
-  c->setMode("push");
-  vector<bvex> vlist = c->getValues();
+  AssocArray<std::vector<std::string>>* lsdata = lsc->getData();
 
-  if (vlist.size() > 0)  {
-      cout << "V_EPIC:" << vlist[0].epic  << endl;
-      cout << "V_BID:" <<  vlist[0].bid << endl;
-      cout << "V_OFFER:" << vlist[0].offer << endl;
-  }
+  assert( lsdata->Size() > 0);
+  assert( lsdata->GetItemName(0) == "MARKET:IX.D.CAC.IMF.IP");
 
-  else {
-    cout << "[ERROR]" << endl;
-    exit(1);
-  }
+  float f1 = atof(lsdata->at(0)[0].c_str());
+  float f2 = atof(lsdata->at(0)[1].c_str());
+  
+  assert(f1 > 0 && f2 > 0);
+  
+  cout << "[OK]" << endl;
+  
+  exit(0);
 
 }
