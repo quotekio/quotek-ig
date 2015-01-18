@@ -1,3 +1,5 @@
+#include "fixtures.hpp"
+
 /*
 IG api C++ Connector v1.0
 Copyright(c) 2015 Clément Gamé.
@@ -27,77 +29,72 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "broker.hpp"
+#include "fixtures.hpp"
 
-broker::broker() {
+
+int main(int argc, char** argv) {
+  
+  if (argc < 2) {
+    cout << "[ERROR] Not enough arguments" << endl;
+    exit(1);
+  }
+
+  cout << "[TEST BROKER] LSClient Subscribe.." ;
+  igConnector* c = get_igconnector(argv[1]);
+  
+  assert(c->connect() == 0); 
+  assert(c->LSStart() == 0);
+  LSClient* lsc = c->getLSClient();
+
+  int ctimeout = 10;
+  int i=0;
+  int connected = 0;
+  while(i < ctimeout)  {
+
+    if ( lsc->getStatus() == LS_STATUS_CONNECTED ) {
+      connected = 1;
+      break;
+    }
+
+    i++;
+    sleep(1);
+  }
+
+  if (!connected) {
+    cout << "[ERROR]" << endl;
+    exit(1);
+  }
+
+  std::vector<std::string> itemlist;
+  itemlist.push_back("MARKET:IX.D.CAC.IMF.IP");
+
+  std::vector<std::string> fields;
+  fields.push_back("BID");
+  fields.push_back("OFFER");
+
+  LSSubscription *s1 = new LSSubscription("MARKET", itemlist, fields);
+
+  lsc->addSubscription(s1);
+
+  if (lsc->subscribeAll() != 0 ) {
+    cout << "[ERROR]" << endl;
+    exit(1);
+  }
+
+  sleep(10);
+
+  c->setMode("push");
+  vector<bvex> vlist = c->getValues();
+
+  if (vlist.size() > 0)  {
+      cout << "V_EPIC:" << vlist[0].epic  << endl;
+      cout << "V_BID:" <<  vlist[0].bid << endl;
+      cout << "V_OFFER:" << vlist[0].offer << endl;
+  }
+
+  else {
+    cout << "[ERROR]" << endl;
+    exit(1);
+  }
 
 }
-
-broker::~broker() {
-
-}
-
-int broker::initialize(string broker_params, 
-                               bool use_logging, 
-                               bool use_profiling, 
-                               string mode) {
-
-  return 0;
-}
-
-int broker::connect() {
-
-  return 0;
-}
-
-void broker::setMode(string) {
-
-}
-
-string broker::getMode() {
-  return "";
-}
-
-
-int broker::requiresIndicesList() {
-
-  return 0;
-}
-
-int broker::setIndicesList(vector<string> il) { 
-
-  return 0;
-}
-
-vector<bvex> broker::getValues() {
-  vector<bvex> v1; 
-  return v1; 
-}
-
-vector<bpex> broker::getPositions() {
-  vector<bpex> p1; 
-  return p1; 
-}
-
-string broker::closePos(string dealid) {
-
-  return "";
-}
-
-string broker::openPos(string epic,
-                       string way,
-                       int nbc,
-                       int stop,
-                       int limit) {
-  return "";
-}
-
-
-
-
-
-
-
-
-
-

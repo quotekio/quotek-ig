@@ -75,10 +75,14 @@ int main(int argc, char** argv) {
   LSSubscription *s1 = new LSSubscription("MARKET", itemlist, fields);
 
   lsc->addSubscription(s1);
-  lsc->subscribeAll();
 
-  while(1) {
-    sleep(1);
+
+  if (lsc->subscribeAll() == 0 ) {
+    cout << "[OK]" << endl;
+    exit(0);
   }
+
+  cout << "[ERROR]" << endl;
+  exit(1);
 
 }

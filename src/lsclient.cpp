@@ -74,10 +74,10 @@ int LSClient::connect() {
 
 int LSClient::subscribeAll() {
 
-  cout << "SUBSCRIBING ALL!" << endl;
-
   std::string subscribe_url = ( ls_control_endpoint.find("https://") == std::string::npos ) ? "https://" : "" ;
   subscribe_url += ls_control_endpoint + "/lightstreamer/control.txt";
+
+  int nb_errors = 0;
 
   for (int i=0;i< ls_subscriptions.size() ;i++) {
 
@@ -101,12 +101,14 @@ int LSClient::subscribeAll() {
       pdata["LS_id"] += "+";
     }
     
-    req2->post(subscribe_url, pdata);
+    std::string resp = req2->post(subscribe_url, pdata);
+    trim(resp);
 
+    if ( resp != "OK" ) {
+      nb_errors++;
+    }
   }
-
-  return 0;
-
+  return nb_errors;
 }
 
 
@@ -117,7 +119,28 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
   if (ptr != NULL) {
       std::string ls_stream(static_cast<const char*>(ptr), size * nmemb);
 
-      if (lsc->getStatus() == LS_STATUS_CONNECTED) cout << ls_stream << endl;
+      
+      
+      if (lsc->getStatus() == LS_STATUS_CONNECTED) {
+
+        cout << ls_stream << endl;
+
+        //actually parses data comming in stream connection
+        AssocArray<  std::vector<std::string> >* lsdata = lsc->getData();
+        if ( ls_stream.find("|") != std::string::npos )  {
+
+          std::vector<std::string> values = split(ls_stream,'|');
+          sreplace(values[0],"2,","");
+          int index = atoi( values[0].c_str() );
+
+          for (int k=1;k< values.size();k++ )  {
+            lsdata->at(index-1)[k] = values[k];
+          }
+
+        } 
+
+      }
+      
 
       std::vector<std::string> resdata = split(ls_stream,'\n');
       for (int i=0;i<resdata.size();i++) {
@@ -163,8 +186,19 @@ void LSClient::setControlEndpoint(std::string ctl_endpoint) {
 
 int LSClient::addSubscription(LSSubscription* s) {
 	ls_subscriptions.push_back(s);
+
+  for (int i=0;i< s->getObjectIds().size();i++ )  {
+    for (int j=0;j< s->getFields().size();j++ ) {
+      ls_data[s->getObjectIds()[i]].push_back("");
+    }
+  }
 	return 0;
 }
+
+AssocArray<std::vector<std::string> >* LSClient::getData() {
+  return &ls_data;
+}
+
 int LSClient::remSubscription(std::string object_id) {
   return 0;
 }

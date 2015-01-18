@@ -55,6 +55,8 @@ public:
     virtual int requiresIndicesList();
     virtual int setIndicesList(vector<string>);
     virtual int connect();
+    virtual void setMode(string);
+    virtual string getMode();
     virtual vector<bvex> getValues();
     virtual vector<bpex> getPositions();
     virtual string openPos(string,string,int,int,int);
@@ -79,6 +81,10 @@ private:
   static void* staticUptimeLoop(void* p);
   void* uptimeLoop(void*);
   void loadCurrenciesMap();
+
+  vector<bvex> getValues_push();
+  vector<bvex> getValues_poll();
+
 };
 
 #endif

@@ -77,7 +77,18 @@ int igConnector::setIndicesList(vector<string> il) {
       ilist = il;
       return 0;
 }
-  
+
+
+void igConnector::setMode(string mode) {
+  connector_mode = mode;
+}
+
+string igConnector::getMode() {
+  return connector_mode;
+}
+
+
+
 int igConnector::connect() {
 
       cst = "";
@@ -180,6 +191,40 @@ LSClient* igConnector::getLSClient() {
 }
 
 vector<bvex> igConnector::getValues() {
+  if (connector_mode == "push") {
+    return getValues_push();
+  }
+  else if (connector_mode == "poll")  {
+    return getValues_poll();
+  }
+
+}
+
+vector<bvex> igConnector::getValues_push()  {
+
+  vector<bvex> result;
+  AssocArray< std::vector<std::string> >* ls_data = ls_client->getData();
+
+  for (int i=0;i< ls_data->Size();i++ )  {
+
+    vector<string> fdata = ls_data->at(i);
+
+    bvex ex1;
+
+    ex1.epic = ls_data->GetItemName(i);
+    sreplace(ex1.epic,"MARKET:","");
+    ex1.bid = atof(fdata[0].c_str());
+    ex1.offer = atof(fdata[1].c_str());
+
+    result.push_back(ex1);
+
+  }
+
+  return result;
+
+}
+
+vector<bvex> igConnector::getValues_poll() {
    
       vector<bvex> result;
 

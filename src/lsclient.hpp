@@ -32,6 +32,7 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pthread.h>
 #include "lssubscription.hpp"
 #include "utils.hpp"
+#include "assoc.hpp"
 
 #define LS_STATUS_INITIALIZED 0x01
 #define LS_STATUS_CONNECTED 0x02
@@ -63,6 +64,8 @@ class LSClient {
     
     void setSessionId(std::string);
     void setControlEndpoint(std::string);
+
+    AssocArray<std::vector<std::string> >* getData();
     
   private:
     
@@ -74,6 +77,6 @@ class LSClient {
   	std::vector<LSSubscription*> ls_subscriptions;
     int ls_status;
     pthread_t stream_thread;
-
+    AssocArray<std::vector<std::string> > ls_data;
 
 };

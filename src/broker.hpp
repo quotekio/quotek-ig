@@ -44,6 +44,8 @@ public:
     broker();
     virtual ~broker();
     virtual int initialize(string, bool, bool, string);
+    virtual void setMode(string);
+    virtual string getMode();
     virtual int connect();
     virtual int requiresIndicesList();
     virtual int setIndicesList(vector<string>);

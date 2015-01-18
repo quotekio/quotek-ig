@@ -1,11 +1,11 @@
 #include "fixtures.hpp"
 
 igConnector* get_igconnector(string broker_params) {
-  return new igConnector(broker_params, false, false, "pull");
+  return new igConnector(broker_params, false, false, "poll");
 }
 
-igConnector* get_igconnector_connected_pullmode(string broker_params) {
-  igConnector* c = new igConnector(broker_params, false, false, "pull");  
+igConnector* get_igconnector_connected_pollmode(string broker_params) {
+  igConnector* c = new igConnector(broker_params, false, false, "poll");  
   c->connect();
   return c;
 }

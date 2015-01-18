@@ -15,37 +15,49 @@ SET (CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
 SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
 
 add_executable(
-        test_connect
+        test_01_connect
         test_connect.cpp
         fixtures.cpp
 )
 
 add_executable(
-        test_lsclient_connect
+        test_02_lsclient_connect
         test_lsclient_connect.cpp
         fixtures.cpp
 )
 
 add_executable(
-        test_lsclient_subscribe
+        test_03_lsclient_subscribe
         test_lsclient_subscribe.cpp
         fixtures.cpp
 )
 
 
+add_executable(
+        test_04_lsclient_getdata
+        test_lsclient_getdata.cpp
+        fixtures.cpp
+)
+
+
+
 target_link_libraries(
-  test_connect
+  test_01_connect
   igconnector3
 )
 
 target_link_libraries(
-  test_lsclient_connect
+  test_02_lsclient_connect
   igconnector3
 )
 
 target_link_libraries(
-  test_lsclient_subscribe
+  test_03_lsclient_subscribe
   igconnector3
 )
 
+target_link_libraries(
+  test_04_lsclient_getdata
+  igconnector3
+)
 
