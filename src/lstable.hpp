@@ -1,5 +1,5 @@
 /*
-IG api C++ Connector v1.0
+This is a Quick'n'Dirty C++ implementation of LightStreamer Client
 Copyright(c) 2015 Clément Gamé.
 
 All rights reserved.
@@ -27,49 +27,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-#ifndef broker_H
-#define broker_H
-
 #include <vector>
 #include <string>
-#include <iostream>
-#include "brokerio.hpp"
+#include "assoc.h"
 
-using namespace std;
+class LSTable {
 
-class broker {
+  public:
 
-public:
-    broker();
-    virtual ~broker();
-    virtual int initialize(string, bool, bool, string);
-    virtual void setMode(string);
-    virtual string getMode();
-    virtual int connect();
-    virtual int initPushService();
-    virtual int requiresIndicesList();
-    virtual int setIndicesList(vector<string>);
-    virtual vector<bvex> getValues();
-    virtual vector<bpex> getPositions();
-    virtual string closePos(string);
-    virtual string openPos(string, string, int ,int ,int);
-    
-private:
+  	LSTable(std::string name, int nb_fields);
+  	std::string getName();
+    AssocArray< std::vector<std::string> >* getData();
+    std::vector<std::string>* getItemData(item_name);
+    int appendData(std::string item_name, std::vector<std::string> item_data);
 
-protected:
-    vector<string> ilist;
-    string username;
-    string password;
-    string api_key;
-    string api_url;
-    string connector_mode;
-    int requires_indices_list;
+  private:
+    std::string name;
+    int nb_fields;
+    AssocArray< std::vector<std::string> > data;
 
 };
-
-// the types of the class factories
-typedef broker* create_t();
-typedef void destroy_t(broker*);
-
-#endif

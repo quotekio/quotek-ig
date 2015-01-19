@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   igConnector* c = get_igconnector(argv[1]);
   
   assert(c->connect() == 0); 
-  assert(c->LSStart() == 0);
+  assert(c->initPushService() == 0);
   LSClient* lsc = c->getLSClient();
 
   int ctimeout = 10;

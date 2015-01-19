@@ -39,6 +39,12 @@ add_executable(
         fixtures.cpp
 )
 
+add_executable(
+        test_05_broker_pushmode_getvalues
+        test_broker_pushmode_getvalues.cpp
+        fixtures.cpp
+)
+
 
 
 target_link_libraries(
@@ -61,3 +67,7 @@ target_link_libraries(
   igconnector3
 )
 
+target_link_libraries(
+  test_05_broker_pushmode_getvalues
+  igconnector3
+)

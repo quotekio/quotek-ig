@@ -156,17 +156,14 @@ int igConnector::connect() {
       //loads currencies map right after connect
       loadCurrenciesMap();
 
+      if (connector_mode == "push") {
+        initPushService();
+      }
+      
       return 0;
     }
 
-
-/*
-int igConnector::LSSetSubscribtions(vector<string>* subscribtions) {
-
-}
-*/
-
-int igConnector::LSStart() {
+int igConnector::initPushService() {
 
    std::string ncst = cst;
    std::string xst = security_token;
@@ -181,8 +178,39 @@ int igConnector::LSStart() {
    ls_password = ncst + "|" + xst;
    ls_client = new LSClient(ls_endpoint, client_id, ls_password);
    ls_client->start();
+
+   int i=0;
    
-   return 0;
+   while (i< LS_STREAM_TIMEOUT) {
+     if (  ls_client->getStatus() == LS_STATUS_CONNECTED ) break;
+     i++;
+     sleep(1);
+
+   }
+
+   if (ls_client->getStatus() == LS_STATUS_CONNECTED ) {
+    
+     //creates subscriptions
+     std::vector<std::string> subscribed_items;
+     for (int j=0; j< ilist.size();j++) {
+       subscribed_items.push_back("MARKET:" + ilist[j]);
+     }
+
+     if (subscribed_items.size() > 0)  {
+       std::vector<std::string> fields;
+       fields.push_back("BID");
+       fields.push_back("OFFER");
+       LSSubscription* s = new LSSubscription("MARKET",subscribed_items,fields);
+       if ( ls_client->subscribeAll() != 0 ) return 1;
+     }
+
+     return 0;
+
+   }
+   else return 1;
+
+
+
 
 }
 
@@ -191,16 +219,21 @@ LSClient* igConnector::getLSClient() {
 }
 
 vector<bvex> igConnector::getValues() {
+
+  vector<bvex> result;
+
   if (connector_mode == "push") {
-    return getValues_push();
+    result =  getValues_push();
   }
   else if (connector_mode == "poll")  {
-    return getValues_poll();
+    result = getValues_poll();
   }
-
+  return result;
 }
 
 vector<bvex> igConnector::getValues_push()  {
+
+  cout << "getting values push mode" << endl;
 
   vector<bvex> result;
   AssocArray< std::vector<std::string> >* ls_data = ls_client->getData();

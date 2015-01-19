@@ -43,6 +43,8 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define MAX_UPTIME 42000
 
+#define LS_STREAM_TIMEOUT 10
+
 
 class igConnector : public broker {
 public:
@@ -61,8 +63,8 @@ public:
     virtual vector<bpex> getPositions();
     virtual string openPos(string,string,int,int,int);
     virtual string closePos(string);
-
-    int LSStart();
+    virtual int initPushService();
+    
     LSClient* getLSClient();
 
 private:

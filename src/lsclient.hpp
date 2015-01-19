@@ -45,10 +45,14 @@ class LSClient {
   public:
 
     //constructor
-    LSClient(std::string url, 
-    		     std::string username, 
-    		     std::string password);
+    LSClient(std::string, 
+    		     std::string, 
+    		     std::string);
 
+    LSClient(std::string, 
+             std::string, 
+             std::string,
+             std::string);
 
     void start();
     int connect();
@@ -56,6 +60,12 @@ class LSClient {
     int getStatus();
     int addSubscription(LSSubscription*);
     int remSubscription(std::string);
+
+    int subscribe(int, 
+                  std::string, 
+                  std::string, 
+                  std::string);
+    
     int subscribeAll();
 
     //callback wrappers
@@ -74,6 +84,7 @@ class LSClient {
   	std::string ls_username;
   	std::string ls_password;
     std::string ls_session_id;
+    std::string ls_adapter_set;
   	std::vector<LSSubscription*> ls_subscriptions;
     int ls_status;
     pthread_t stream_thread;

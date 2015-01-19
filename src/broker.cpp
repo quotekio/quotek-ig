@@ -50,6 +50,10 @@ int broker::connect() {
   return 0;
 }
 
+int broker::initPushService() {
+  return 0;
+}
+
 void broker::setMode(string) {
 
 }

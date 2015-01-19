@@ -40,8 +40,26 @@ LSClient::LSClient(std::string url,
   ls_password = password;
 
   ls_status = LS_STATUS_INITIALIZED;
+  ls_adapter_set = "";
 
 }
+
+LSClient::LSClient(std::string url, 
+               std::string username, 
+               std::string password,
+               std::string adapter) {
+
+  ls_endpoint = url;
+  ls_control_endpoint = url;
+  ls_username = username;
+  ls_password = password;
+  ls_adapter_set = adapter;
+
+  ls_status = LS_STATUS_INITIALIZED;
+
+}
+
+
 
 void LSClient::start()  {
   pthread_create(&stream_thread, NULL, LSClient::streamThreadWrapper, this);
@@ -59,7 +77,8 @@ int LSClient::connect() {
   AssocArray<string> pdata;
   pdata["LS_user"] = ls_username ;
   pdata["LS_password"] = ls_password ;
-    
+  if (ls_adapter_set != "") pdata["LS_adapter_set"] = ls_adapter_set;
+
   std::string create_session_url = ls_endpoint + "/lightstreamer/create_session.txt";  
 
   //sets stream callback
@@ -69,6 +88,54 @@ int LSClient::connect() {
   req->post2(create_session_url, pdata);
 
   return 0;
+
+}
+
+
+int LSClient::subscribe(int subscription_index, 
+                        std::string table, 
+                        std::string operation, 
+                        std::string mode) {
+
+  std::string subscribe_url = ( ls_control_endpoint.find("https://") == std::string::npos ) ? "https://" : "" ;
+  subscribe_url += ls_control_endpoint + "/lightstreamer/control.txt";
+
+  int nb_errors = 0;
+
+  if ( subscription_index > ls_subscriptions.size() + 1 ) return 1;
+
+  LSSubscription* s = ls_subscriptions[subscription_index];
+
+  http* req2 = new http();
+
+  AssocArray<std::string> pdata;
+  pdata["LS_session"] = ls_session_id;
+  pdata["LS_op"] = operation;
+  pdata["LS_table"] = table;
+  pdata["LS_schema"] = "";
+  pdata["LS_id"] = "";
+  pdata["LS_mode"] = mode;
+  
+  if (ls_adapter_set != "") pdata["LS_adapter_set"] = ls_adapter_set;
+
+    for (int j=0;j< s->getFields().size();j++ ) {
+      pdata["LS_schema"] += s->getFields()[j];
+      pdata["LS_schema"] += "+";
+    }
+
+    for (int j=0;j< s->getObjectIds().size();j++ ) {
+      pdata["LS_id"] += s->getObjectIds()[j];
+      pdata["LS_id"] += "+";
+    }
+    
+    std::string resp = req2->post(subscribe_url, pdata);
+    trim(resp);
+
+    if ( resp != "OK" ) {
+      nb_errors++;
+    }
+  
+  return nb_errors;
 
 }
 
@@ -90,6 +157,8 @@ int LSClient::subscribeAll() {
     pdata["LS_schema"] = "";
     pdata["LS_id"] = "";
     pdata["LS_mode"] = "MERGE";
+
+    if (ls_adapter_set != "") pdata["LS_adapter_set"] = ls_adapter_set;
 
     for (int j=0;j< ls_subscriptions[i]->getFields().size();j++ ) {
       pdata["LS_schema"] += ls_subscriptions[i]->getFields()[j];
@@ -119,15 +188,16 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
   if (ptr != NULL) {
       std::string ls_stream(static_cast<const char*>(ptr), size * nmemb);
 
-      
-      
-      if (lsc->getStatus() == LS_STATUS_CONNECTED) {
+      if (lsc->getStatus() == LS_STATUS_CONNECTED || 
+          lsc->getStatus() == LS_STATUS_RECEIVING ) {
 
         cout << ls_stream << endl;
 
         //actually parses data comming in stream connection
         AssocArray<  std::vector<std::string> >* lsdata = lsc->getData();
         if ( ls_stream.find("|") != std::string::npos )  {
+
+          lsc->setStatus(LS_STATUS_RECEIVING);
 
           std::vector<std::string> values = split(ls_stream,'|');
           sreplace(values[0],"2,","");
@@ -141,7 +211,6 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
 
       }
       
-
       std::vector<std::string> resdata = split(ls_stream,'\n');
       for (int i=0;i<resdata.size();i++) {
         trim(resdata[i]);
