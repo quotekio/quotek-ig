@@ -21,6 +21,7 @@ add_library(
         src/igconnector.cpp
         src/utils.cpp
         src/lsclient.cpp
+        src/lstable.cpp
         src/lssubscription.cpp
         src/http.cpp
 )
@@ -42,5 +43,6 @@ install (FILES "src/brokerio.hpp" DESTINATION include/igconnector/)
 install (FILES "src/igconnector.hpp" DESTINATION include/igconnector/)
 install (FILES "src/lsclient.hpp" DESTINATION include/igconnector/)
 install (FILES "src/lssubscription.hpp" DESTINATION include/igconnector/)
+install (FILES "src/lstable.hpp" DESTINATION include/igconnector/)
 install (DIRECTORY "src/rapidjson" DESTINATION include/igconnector/)
 

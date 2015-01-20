@@ -31,6 +31,7 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <pthread.h>
 #include "lssubscription.hpp"
+#include "lstable.hpp"
 #include "utils.hpp"
 #include "assoc.hpp"
 

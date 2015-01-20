@@ -153,7 +153,7 @@ int LSClient::subscribeAll() {
     AssocArray<std::string> pdata;
     pdata["LS_session"] = ls_session_id;
     pdata["LS_op"] = "add";
-    pdata["LS_table"] = "2";
+    pdata["LS_table"] = "0";
     pdata["LS_schema"] = "";
     pdata["LS_id"] = "";
     pdata["LS_mode"] = "MERGE";
@@ -200,7 +200,7 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
           lsc->setStatus(LS_STATUS_RECEIVING);
 
           std::vector<std::string> values = split(ls_stream,'|');
-          sreplace(values[0],"2,","");
+          sreplace(values[0],"MARKET_1,","");
           int index = atoi( values[0].c_str() );
 
           for (int k=1;k< values.size();k++ )  {

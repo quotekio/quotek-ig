@@ -29,25 +29,61 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "lstable.hpp"
 
-LSTable::LSTable(std::string name, int nfields) {
+std::vector<LSTable*> LSTable::table_list;
 
+LSTable::LSTable(int nfields) {
   nb_fields = nfields;
-  
-}
-
-std::string getName() {
-  return name;
 }
 
 AssocArray< std::vector<std::string> >* LSTable::getData() {
   return &data;
 }
 
-std::vector<std::string>* LSTable::getItemData(item_name) {
+std::vector<std::string>* LSTable::getItemData(std::string item_name) {
   return &data[item_name];
 }
 
-int appendData(std::string item_name, std::vector<std::string> item_data) {
+int LSTable::appendData(std::string item_name, std::vector<std::string> item_data) {
   if ( item_data.size() != nb_fields ) return 1;
   data[item_name] = item_data;
+  return 0;
 }
+
+
+/* STATIC METHODS */
+
+LSTable* LSTable::getTable(int tnum) {
+
+  if ( tnum >= LSTable::table_list.size() ) {
+    return NULL;
+  }
+  return LSTable::table_list[tnum];
+}
+
+LSTable* LSTable::addTable(int nb_fields) {
+
+  	LSTable* t = new LSTable(nb_fields);
+  	LSTable::table_list.push_back(t);
+    return t;
+}
+
+int LSTable::removeTable(int tnum) {
+
+  if ( tnum >= LSTable::table_list.size() ) {
+    return 1;
+  }
+
+  LSTable::table_list.erase(LSTable::table_list.begin() + tnum);
+  return 0;
+}
+
+int LSTable::append(int tnum, int item_num, std::vector<std::string> item_data) {
+
+  LSTable* s = LSTable::getTable(tnum);
+  
+
+
+}
+
+
+

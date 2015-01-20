@@ -29,20 +29,22 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <string>
-#include "assoc.h"
+#include "assoc.hpp"
 
 class LSTable {
 
   public:
 
-  	LSTable(std::string name, int nb_fields);
-  	std::string getName();
+  	LSTable(int);
     AssocArray< std::vector<std::string> >* getData();
-    std::vector<std::string>* getItemData(item_name);
-    int appendData(std::string item_name, std::vector<std::string> item_data);
+    std::vector<std::string>* getItemData(std::string);
+    static LSTable* getTable(int);
+    static LSTable* addTable(int);
+    static int removeTable(int);
+     int appendData(string, std::vector<std::string>);
+    static std::vector<LSTable*> table_list;
 
   private:
-    std::string name;
     int nb_fields;
     AssocArray< std::vector<std::string> > data;
 
