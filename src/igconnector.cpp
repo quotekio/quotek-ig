@@ -243,14 +243,18 @@ vector<bvex> igConnector::getValues_push()  {
 
     for (int j=0;j< subscriptions->at(i)->getObjectIds().size(); j++ ) {
 
-      bvex ex1;
-      ex1.epic = subscriptions->at(i)->getObjectIds()[j];
-      ex1.bid =  atof(t->getItemData(j)->at(0).c_str());
-      ex1.offer = atof(t->getItemData(j)->at(1).c_str());
+      vector<string>* values = t->getItemData(j);
 
-      sreplace(ex1.epic,"MARKET:","");
-      result.push_back(ex1);
-
+      if (values->size() > 1 ) {
+        if ( values->at(0) != "" ) {
+          bvex ex1;
+          ex1.epic = subscriptions->at(i)->getObjectIds()[j];
+          ex1.bid =  atof(values->at(0).c_str());
+          ex1.offer = atof(values->at(1).c_str());
+          sreplace(ex1.epic,"MARKET:","");
+          result.push_back(ex1);
+        }
+      }
     }
 
   }

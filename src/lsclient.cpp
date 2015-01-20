@@ -196,7 +196,8 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
       if (lsc->getStatus() == LS_STATUS_CONNECTED || 
           lsc->getStatus() == LS_STATUS_RECEIVING ) {
 
-        cout << ls_stream << endl;
+        //debug
+        //cout << ls_stream << endl;
 
         //actually parses data comming in stream connection
         if ( ls_stream.find("|") != std::string::npos )  {
