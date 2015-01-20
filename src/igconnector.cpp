@@ -67,7 +67,7 @@ int igConnector::initialize(string broker_params,
       pthread_create(&uptime_loop,NULL,igConnector::staticUptimeLoop, this);
 
       return 0;
-    }
+}
 
 int igConnector::requiresIndicesList() {
   return requires_indices_list;
@@ -201,6 +201,8 @@ int igConnector::initPushService() {
        fields.push_back("BID");
        fields.push_back("OFFER");
        LSSubscription* s = new LSSubscription("MARKET",subscribed_items,fields);
+       ls_client->addSubscription(s);
+
        if ( ls_client->subscribeAll() != 0 ) return 1;
      }
 
@@ -208,9 +210,6 @@ int igConnector::initPushService() {
 
    }
    else return 1;
-
-
-
 
 }
 
@@ -233,28 +232,30 @@ vector<bvex> igConnector::getValues() {
 
 vector<bvex> igConnector::getValues_push()  {
 
-  cout << "getting values push mode" << endl;
+
+  std::vector<LSSubscription*>* subscriptions = ls_client->getSubscriptions();
 
   vector<bvex> result;
-  AssocArray< std::vector<std::string> >* ls_data = ls_client->getData();
 
-  for (int i=0;i< ls_data->Size();i++ )  {
+  for (int i=0;i< subscriptions->size();i++ )  {
 
-    vector<string> fdata = ls_data->at(i);
+    LSTable* t = subscriptions->at(i)->table_ref;
 
-    bvex ex1;
+    for (int j=0;j< subscriptions->at(i)->getObjectIds().size(); j++ ) {
 
-    ex1.epic = ls_data->GetItemName(i);
-    sreplace(ex1.epic,"MARKET:","");
-    ex1.bid = atof(fdata[0].c_str());
-    ex1.offer = atof(fdata[1].c_str());
+      bvex ex1;
+      ex1.epic = subscriptions->at(i)->getObjectIds()[j];
+      ex1.bid =  atof(t->getItemData(j)->at(0).c_str());
+      ex1.offer = atof(t->getItemData(j)->at(1).c_str());
 
-    result.push_back(ex1);
+      sreplace(ex1.epic,"MARKET:","");
+      result.push_back(ex1);
+
+    }
 
   }
 
   return result;
-
 }
 
 vector<bvex> igConnector::getValues_poll() {

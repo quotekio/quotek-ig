@@ -61,6 +61,7 @@ class LSClient {
     int getStatus();
     int addSubscription(LSSubscription*);
     int remSubscription(std::string);
+    std::vector<LSSubscription*>* getSubscriptions();
 
     int subscribe(int, 
                   std::string, 
@@ -89,6 +90,4 @@ class LSClient {
   	std::vector<LSSubscription*> ls_subscriptions;
     int ls_status;
     pthread_t stream_thread;
-    AssocArray<std::vector<std::string> > ls_data;
-
 };

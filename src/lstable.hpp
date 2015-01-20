@@ -27,6 +27,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef LSTABLE_HPP
+#define LSTABLE_HPP
+
 #include <vector>
 #include <string>
 #include "assoc.hpp"
@@ -35,17 +38,22 @@ class LSTable {
 
   public:
 
-  	LSTable(int);
-    AssocArray< std::vector<std::string> >* getData();
-    std::vector<std::string>* getItemData(std::string);
+  	LSTable(int, int);
+    std::vector< std::vector<std::string> >* getData();
+    std::vector<std::string>* getItemData(int item_num);
     static LSTable* getTable(int);
-    static LSTable* addTable(int);
+    static LSTable* addTable(int,int);
     static int removeTable(int);
-     int appendData(string, std::vector<std::string>);
+    static int append(int,int,std::vector<std::string>);
+    static int getTableSequence();
+    //int appendData(string, std::vector<std::string>);
+    int appendData(int, std::vector<std::string>);
     static std::vector<LSTable*> table_list;
 
   private:
     int nb_fields;
-    AssocArray< std::vector<std::string> > data;
+    std::vector< std::vector<std::string> > data;
 
 };
+
+#endif

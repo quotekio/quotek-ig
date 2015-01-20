@@ -29,6 +29,7 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <vector>
+#include "lstable.hpp"
 
 class LSSubscription {
 
@@ -37,9 +38,11 @@ class LSSubscription {
   	std::string getItemType();
   	std::vector<std::string> getObjectIds();
   	std::vector<std::string> getFields();
+  	LSTable* table_ref;
   protected:
   	std::string item_type;
   	std::vector<std::string> object_ids;
   	std::vector<std::string> fields;
+
 };
 

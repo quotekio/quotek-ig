@@ -31,26 +31,36 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 std::vector<LSTable*> LSTable::table_list;
 
-LSTable::LSTable(int nfields) {
+LSTable::LSTable(int nb_items, int nfields) {
+
+  for (int i=0; i< nb_items;i++ ) {
+    std::vector<std::string> v;
+    data.push_back(v);
+  }
+
   nb_fields = nfields;
 }
 
-AssocArray< std::vector<std::string> >* LSTable::getData() {
+std::vector< std::vector<std::string> >* LSTable::getData() {
   return &data;
 }
 
-std::vector<std::string>* LSTable::getItemData(std::string item_name) {
-  return &data[item_name];
+std::vector<std::string>* LSTable::getItemData(int item_num) {
+  return &data[item_num];
 }
 
-int LSTable::appendData(std::string item_name, std::vector<std::string> item_data) {
+int LSTable::appendData(int item_num, std::vector<std::string> item_data) {
   if ( item_data.size() != nb_fields ) return 1;
-  data[item_name] = item_data;
+  data[item_num] = item_data;
   return 0;
 }
 
 
 /* STATIC METHODS */
+
+int LSTable::getTableSequence() {
+  return LSTable::table_list.size() -1;
+}
 
 LSTable* LSTable::getTable(int tnum) {
 
@@ -60,9 +70,9 @@ LSTable* LSTable::getTable(int tnum) {
   return LSTable::table_list[tnum];
 }
 
-LSTable* LSTable::addTable(int nb_fields) {
+LSTable* LSTable::addTable(int nb_items, int nb_fields) {
 
-  	LSTable* t = new LSTable(nb_fields);
+  	LSTable* t = new LSTable(nb_items, nb_fields);
   	LSTable::table_list.push_back(t);
     return t;
 }
@@ -78,12 +88,14 @@ int LSTable::removeTable(int tnum) {
 }
 
 int LSTable::append(int tnum, int item_num, std::vector<std::string> item_data) {
-
   LSTable* s = LSTable::getTable(tnum);
-  
+  if (s!= NULL) {
+    return s->appendData(item_num,item_data);
+  }
 
-
+  return 1;
 }
+
 
 
 

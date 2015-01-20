@@ -141,6 +141,7 @@ int LSClient::subscribe(int subscription_index,
 
 int LSClient::subscribeAll() {
 
+
   std::string subscribe_url = ( ls_control_endpoint.find("https://") == std::string::npos ) ? "https://" : "" ;
   subscribe_url += ls_control_endpoint + "/lightstreamer/control.txt";
 
@@ -148,12 +149,16 @@ int LSClient::subscribeAll() {
 
   for (int i=0;i< ls_subscriptions.size() ;i++) {
 
+    LSTable* s = LSTable::addTable(ls_subscriptions[i]->getObjectIds().size(),
+                                   ls_subscriptions[i]->getFields().size());
+    ls_subscriptions[i]->table_ref = s;
+
     http* req2 = new http();
 
     AssocArray<std::string> pdata;
     pdata["LS_session"] = ls_session_id;
     pdata["LS_op"] = "add";
-    pdata["LS_table"] = "0";
+    pdata["LS_table"] = int2string(LSTable::getTableSequence()) ;
     pdata["LS_schema"] = "";
     pdata["LS_id"] = "";
     pdata["LS_mode"] = "MERGE";
@@ -194,18 +199,19 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
         cout << ls_stream << endl;
 
         //actually parses data comming in stream connection
-        AssocArray<  std::vector<std::string> >* lsdata = lsc->getData();
         if ( ls_stream.find("|") != std::string::npos )  {
 
           lsc->setStatus(LS_STATUS_RECEIVING);
 
           std::vector<std::string> values = split(ls_stream,'|');
-          sreplace(values[0],"MARKET_1,","");
-          int index = atoi( values[0].c_str() );
+          std::vector<std::string> values_map = split(values[0],',');
 
-          for (int k=1;k< values.size();k++ )  {
-            lsdata->at(index-1)[k-1] = values[k];
-          }
+          int tnum = atoi(values_map[0].c_str());
+          int indices_num = atoi(values_map[1].c_str()) - 1;
+
+          values.erase(values.begin());
+          LSTable::append(tnum, indices_num, values);
+
 
         } 
 
@@ -255,23 +261,16 @@ void LSClient::setControlEndpoint(std::string ctl_endpoint) {
 
 int LSClient::addSubscription(LSSubscription* s) {
 	ls_subscriptions.push_back(s);
-
-  for (int i=0;i< s->getObjectIds().size();i++ )  {
-    for (int j=0;j< s->getFields().size();j++ ) {
-      ls_data[s->getObjectIds()[i]].push_back("");
-    }
-  }
 	return 0;
-}
-
-AssocArray<std::vector<std::string> >* LSClient::getData() {
-  return &ls_data;
 }
 
 int LSClient::remSubscription(std::string object_id) {
   return 0;
 }
 
+std::vector<LSSubscription*>* LSClient::getSubscriptions() {
+  return &ls_subscriptions;
+}
 
 
 

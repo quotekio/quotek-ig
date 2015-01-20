@@ -82,16 +82,6 @@ int main(int argc, char** argv) {
   }
 
   sleep(10);
-
-  AssocArray<std::vector<std::string>>* lsdata = lsc->getData();
-
-  assert( lsdata->Size() > 0);
-  assert( lsdata->GetItemName(0) == "MARKET:IX.D.CAC.IMF.IP");
-
-  float f1 = atof(lsdata->at(0)[0].c_str());
-  float f2 = atof(lsdata->at(0)[1].c_str());
-  
-  assert(f1 > 0 && f2 > 0);
   
   cout << "[OK]" << endl;
   

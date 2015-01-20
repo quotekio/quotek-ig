@@ -58,5 +58,18 @@ int main(int argc, char** argv) {
     cout << "OFFER:" << vals[i].offer << endl;
   }
 
+  sleep(2);
+
+  vals = c->getValues();
+
+  for (int i=0;i< vals.size();i++) {
+
+    cout << "EPIC:" << vals[i].epic << endl;
+    cout << "BID:" << vals[i].bid << endl;
+    cout << "OFFER:" << vals[i].offer << endl;
+  }
+
+
+
 }
 
