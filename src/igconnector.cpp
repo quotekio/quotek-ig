@@ -47,6 +47,8 @@ int igConnector::initialize(string broker_params,
                             bool use_profiling, 
                             string mode ) {
 
+      pthread_mutex_init( &lastpos_mtx, NULL );
+
       rapidjson::Document d;
       d.Parse<0>(broker_params.c_str());
 
@@ -369,10 +371,72 @@ vector<bpex> igConnector::getPositions() {
         }
       }
 
+      pthread_mutex_lock(&lastpos_mtx);
       lastpos = result;
+      pthread_mutex_unlock(&lastpos_mtx);
       return result;
 }
+
+string igConnector::closePos(string dealid) {
+  
+    string temp = "";
+    string c_url = api_url + "/gateway/deal/positions/otc" ;
+    curl_slist *headers = NULL;
+    rapidjson::Document d;
+    string pdata;
+
+    bpex pos;
+
+    pthread_mutex_lock(&lastpos_mtx);
+    //finds position in current list
+    for (int i=0;i<lastpos.size();i++) {
+      if (lastpos[i].dealid == dealid) {
+        pos = lastpos[i];
+        break;
+      }
+    }
+    pthread_mutex_unlock(&lastpos_mtx);
+
+    string way = ( pos.size < 0 ) ? "BUY" : "SELL";
+    int size = (pos.size < 0) ? pos.size * -1 : pos.size; 
     
+    headers = addHeaders();
+
+    //hack IG DELETE with body Issue
+    headers = curl_slist_append(headers, "_METHOD: DELETE");
+
+    pdata = "{\n";
+    pdata += "    \"dealId\": \"" + dealid + "\",\n";
+    pdata += "    \"expiry\": \"-\",\n";
+    pdata += "    \"direction\": \"" + upper(way) + "\",\n";
+    pdata += "    \"size\": \"" + int2string(size) + "\",\n";
+    pdata += "    \"orderType\": \"MARKET\"\n";
+    pdata += "}";
+
+    CURL* ch = curl_easy_init();
+    curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
+    curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
+    curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
+    //hack IG DELETE with body Issue
+    //curl_easy_setopt(ch, CURLOPT_CUSTOMREQUEST, "DELETE"); 
+    curl_easy_setopt(ch,CURLOPT_POST,1);
+    curl_easy_setopt(ch,CURLOPT_POSTFIELDS, pdata.c_str());
+    curl_easy_perform(ch);
+    curl_easy_cleanup(ch);
+
+    curl_slist_free_all(headers);
+
+    d.Parse<0>(temp.c_str());
+    if (d.HasParseError() ) return "";
+
+
+    string res = "ERROR: NULLREF";
+    if (! d["dealReference"].IsNull() ) res = d["dealReference"].GetString();
+    else if (! d["errorCode"].IsNull()) res = std::string("ERROR:") + d["errorCode"].GetString();
+    return res;
+
+}
 
 string igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
 
@@ -442,64 +506,6 @@ string igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
 
   }
 
-string igConnector::closePos(string dealid) {
-  
-    string temp = "";
-    string c_url = api_url + "/gateway/deal/positions/otc" ;
-    curl_slist *headers = NULL;
-    rapidjson::Document d;
-    string pdata;
-
-    bpex pos;
-
-    //finds position in current list
-    for (int i=0;i<lastpos.size();i++) {
-      if (lastpos[i].dealid == dealid) {
-        pos = lastpos[i];
-        break;
-      }
-    }
-
-    string way = ( pos.size < 0 ) ? "BUY" : "SELL";
-    int size = (pos.size < 0) ? pos.size * -1 : pos.size; 
-    
-    headers = addHeaders();
-
-    //hack IG DELETE with body Issue
-    headers = curl_slist_append(headers, "_METHOD: DELETE");
-
-    pdata = "{\n";
-    pdata += "    \"dealId\": \"" + dealid + "\",\n";
-    pdata += "    \"expiry\": \"-\",\n";
-    pdata += "    \"direction\": \"" + upper(way) + "\",\n";
-    pdata += "    \"size\": \"" + int2string(size) + "\",\n";
-    pdata += "    \"orderType\": \"MARKET\"\n";
-    pdata += "}";
-
-    CURL* ch = curl_easy_init();
-    curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
-    curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
-    curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
-    //hack IG DELETE with body Issue
-    //curl_easy_setopt(ch, CURLOPT_CUSTOMREQUEST, "DELETE"); 
-    curl_easy_setopt(ch,CURLOPT_POST,1);
-    curl_easy_setopt(ch,CURLOPT_POSTFIELDS, pdata.c_str());
-    curl_easy_perform(ch);
-    curl_easy_cleanup(ch);
-
-    curl_slist_free_all(headers);
-
-    d.Parse<0>(temp.c_str());
-    if (d.HasParseError() ) return "";
-
-
-    string res = "ERROR: NULLREF";
-    if (! d["dealReference"].IsNull() ) res = d["dealReference"].GetString();
-    else if (! d["errorCode"].IsNull()) res = std::string("ERROR:") + d["errorCode"].GetString();
-    return res;
-
-}
 
 curl_slist* igConnector::addHeaders() {
 
