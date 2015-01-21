@@ -141,7 +141,6 @@ int LSClient::subscribe(int subscription_index,
 
 int LSClient::subscribeAll() {
 
-
   std::string subscribe_url = ( ls_control_endpoint.find("https://") == std::string::npos ) ? "https://" : "" ;
   subscribe_url += ls_control_endpoint + "/lightstreamer/control.txt";
 
@@ -243,6 +242,7 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
     }
     return size*nmemb;
 }
+
 
 void LSClient::setSessionId(std::string sessid) {
   ls_session_id = sessid;

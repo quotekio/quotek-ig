@@ -41,23 +41,56 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define LS_STATUS_CONNECT_ERROR 0x40
 
+
+/** LSClient class is the main project Class.
+ *
+ */
 class LSClient {
 
   public:
 
-    //constructor
-    LSClient(std::string, 
-    		     std::string, 
-    		     std::string);
+    /**
+     * LSClient Object constructor 1.
+     * @param url the lightstreamer server endpoint URL.
+     * @param username the lightstreamer account username.
+     * @param password the lightstreamer account password.
+     * @return a new LSClient object.
+     */
+    LSClient(std::string url, 
+    		     std::string username, 
+    		     std::string password);
 
-    LSClient(std::string, 
-             std::string, 
-             std::string,
-             std::string);
+    /**
+     * LSClient Object constructor 2.
+     * @param url the lightstreamer server endpoint URL.
+     * @param username the lightstreamer account username.
+     * @param password the lightstreamer account password.
+     * @param adapter the lightstreamer adapter set to use.
+     * @return a new LSClient object.
+     */
+    LSClient(std::string url, 
+             std::string username, 
+             std::string password,
+             std::string adapter);
 
+    /** This method starts the Lightstreamer Stream Connection Thread.
+     *  It starts LSClient::streamThreadWrapper asynchronously.
+     */
     void start();
+
+    /** This Initiates the Lightstreamer Stream Connection. If you plan to use this method manually,
+     *  wrap it in a thread.
+     */
     int connect();
-    void setStatus(int);
+
+    /** Sets the Lightstreamer Client status. It not meant to be used directly but needs to
+     *  remain public.
+     */
+    void setStatus(int st);
+
+    /** Retrieves the status of the LSClient connection.
+     *  @return the status of LSClient as an integer.
+     */
     int getStatus();
     int addSubscription(LSSubscription*);
     int remSubscription(std::string);
@@ -68,16 +101,30 @@ class LSClient {
                   std::string, 
                   std::string);
     
+    /** Gives all the LSSubscriptions added to the LSClient object to Lightstreamer
+     *  server control.
+     *  @return 0 if subscriptions are ok, 1 otherwise.
+     */
+
     int subscribeAll();
 
     //callback wrappers
+
+    /** This is the main function of LSClient, the LS Stream connection
+     *  parsing loop. 
+     */
     static size_t streamCallbackWrapper(void*, size_t, size_t, void*);
     static void* streamThreadWrapper(void*);
     
+    /** Sets the Lightstreamer Client Session ID.
+     *  @param sessid The Sesion ID returned by the Stream connection.
+     */
     void setSessionId(std::string);
-    void setControlEndpoint(std::string);
 
-    AssocArray<std::vector<std::string> >* getData();
+    /** Sets the lightstream control endpoint ( if different from lightstreamer endpoint)
+     *  @param ctl_endpoint
+     */
+    void setControlEndpoint(std::string);
     
   private:
     
