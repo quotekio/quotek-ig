@@ -64,10 +64,14 @@ public:
     virtual string openPos(string,string,int,int,int);
     virtual string closePos(string);
     virtual int initPushService();
+    virtual std::vector<brokerError*>* getErrors();
     
     LSClient* getLSClient();
 
+
 private:
+
+  brokerError* addError(int, string, string);
 
   string cst;
   string security_token;

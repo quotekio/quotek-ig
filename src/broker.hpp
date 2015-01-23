@@ -38,6 +38,19 @@ THE USE OF THIS SOFTWARE,EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 
+
+class brokerError  {
+
+  public:
+    brokerError(int, string, string);
+    int timestamp;
+    string type;
+    string message;
+
+};
+
+
+
 class broker {
 
 public:
@@ -54,17 +67,21 @@ public:
     virtual vector<bpex> getPositions();
     virtual string closePos(string);
     virtual string openPos(string, string, int ,int ,int);
-    
+    virtual std::vector<brokerError*>* getErrors();
+
 private:
 
 protected:
     vector<string> ilist;
+    vector<brokerError*> errlist;
     string username;
     string password;
     string api_key;
     string api_url;
     string connector_mode;
     int requires_indices_list;
+
+    brokerError* addError(int, string, string);
 
 };
 

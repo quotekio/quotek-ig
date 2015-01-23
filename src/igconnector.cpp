@@ -242,11 +242,8 @@ vector<bvex> igConnector::getValues_push()  {
   for (int i=0;i< subscriptions->size();i++ )  {
 
     LSTable* t = subscriptions->at(i)->table_ref;
-
     for (int j=0;j< subscriptions->at(i)->getObjectIds().size(); j++ ) {
-
       vector<string>* values = t->getItemData(j);
-
       if (values->size() > 1 ) {
         if ( values->at(0) != "" ) {
           bvex ex1;
@@ -291,7 +288,10 @@ vector<bvex> igConnector::getValues_poll() {
       curl_slist_free_all(headers);
 
       d.Parse<0>(temp.c_str());
-      if (d.HasParseError() ) return result;
+      if (d.HasParseError() ) {
+        addError(time(0), "getvalues_error_nojson", temp);
+        return result;
+      }
 
       if (d["marketDetails"].IsArray()) {
         
@@ -307,8 +307,13 @@ vector<bvex> igConnector::getValues_poll() {
 
       }
 
+      else {
+        addError(time(0),"getvalues_error_api_response", temp);
+      }
+
       return result;
 }
+
 
 vector<bpex> igConnector::getPositions() {
 
@@ -332,7 +337,10 @@ vector<bpex> igConnector::getPositions() {
       curl_slist_free_all(headers);
       
       d.Parse<0>(temp.c_str());
-      if (d.HasParseError() ) return result;
+      if (d.HasParseError() ) {
+        addError( time(0), "getpos_error_nojson", temp );
+        return result;
+      }
 
       if (d["positions"].IsArray()) {
         for (int i=0;i<d["positions"].Capacity();i++) {
@@ -369,6 +377,10 @@ vector<bpex> igConnector::getPositions() {
           result.push_back(p1);
           
         }
+      }
+
+      else  {
+        addError(time(0), "getpos_error_api_response", temp);
       }
 
       pthread_mutex_lock(&lastpos_mtx);
@@ -610,6 +622,19 @@ void igConnector::loadCurrenciesMap() {
     }
 
 }
+
+
+std::vector<brokerError*>* igConnector::getErrors() {
+  return &errlist;
+}
+
+brokerError* igConnector::addError(int timestamp, string type, string message) {
+
+  brokerError *b = new brokerError(timestamp, type, message);
+  errlist.push_back(b);
+  return b;
+}
+
 
 // the class factories
 extern "C" broker* create() {

@@ -97,6 +97,25 @@ string broker::openPos(string epic,
 }
 
 
+std::vector<brokerError*>* broker::getErrors() {
+  return &errlist;
+}
+
+brokerError* broker::addError(int timestamp, string type, string message) {
+
+  brokerError *b = new brokerError(timestamp, type, message);
+  errlist.push_back(b);
+  return b;
+
+}
+
+
+brokerError::brokerError(int t, string tp, string msg) {
+
+  timestamp = t;
+  type = tp;
+  message = msg;
+}
 
 
 
