@@ -440,17 +440,25 @@ string igConnector::closePos(string dealid) {
     curl_slist_free_all(headers);
 
     d.Parse<0>(temp.c_str());
-    if (d.HasParseError() ) return "";
+    if (d.HasParseError() ) return "ERROR:NOJSON_ERROR";
 
 
     string res = "ERROR: NULLREF";
-    if (! d["dealReference"].IsNull() ) res = d["dealReference"].GetString();
+
+    if (! d["dealReference"].IsNull() ) {
+      string dealref = d["dealReference"].GetString();
+      res = confirmCloseDeal(dealref);
+
+    }
     else if (! d["errorCode"].IsNull()) res = std::string("ERROR:") + d["errorCode"].GetString();
-    return res;
+
+  return res;
 
 }
 
-string igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
+bpex igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
+
+    bpex ex1;
 
     string temp = "";
     string pdata = "";
@@ -509,14 +517,106 @@ string igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
     curl_slist_free_all(headers);
     
     d.Parse<0>(temp.c_str());
-    if (d.HasParseError() ) return "";
+    if (d.HasParseError() ) {
+      ex1.status = "ERROR";
+      ex1.reason = "JSON_PARSING_ERROR";
+      return ex1;
+    }
 
-    string res = "ERROR: NULLREF";
-    if (! d["dealReference"].IsNull() ) res = d["dealReference"].GetString();
-    else if (! d["errorCode"].IsNull()) res = std::string("ERROR:") + d["errorCode"].GetString();
-    return res;
+    if (! d["dealReference"].IsNull() ) {
+      string dealref = d["dealReference"].GetString();
+      return confirmOpenDeal(dealref);
+    }
+
+    else if (! d["errorCode"].IsNull()) {
+      ex1.status = "ERROR";
+      ex1.reason = d["errorCode"].GetString();
+    }
+
+    return ex1;
 
   }
+
+
+bpex igConnector::confirmOpenDeal(std::string dealref ) {
+
+  bpex ex1;
+
+  string temp = "";
+  CURL* ch = curl_easy_init();
+  string c_url = api_url + "/gateway/confirms/" + dealref;
+
+  curl_slist *headers = NULL;
+  rapidjson::Document d;  
+  headers = addHeaders();
+
+  curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
+  curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
+  curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
+  curl_easy_perform(ch);
+  curl_easy_cleanup(ch);
+
+  curl_slist_free_all(headers);
+  
+  d.Parse<0>(temp.c_str());
+  if (d.HasParseError() ) {
+    ex1.status = "ERROR";
+    ex1.reason = "JSON_PARSING_ERROR";
+    return ex1;
+  };
+
+  ex1.status = d["dealStatus"].GetString();
+  ex1.reason = d["reason"].GetString();
+  ex1.open = d["level"].GetDouble();
+  ex1.stop = d["stopLevel"].GetDouble();
+  ex1.limit = d["limitLevel"].GetDouble();
+  ex1.dealid = d["dealId"].GetString();
+  ex1.epic = d["epic"].GetString();
+
+  ex1.size = roundint( d["size"].GetDouble() );
+
+  std::string direction = d["direction"].GetString();
+
+  if ( direction == "SELL" ) ex1.size *= -1; 
+
+  return ex1;
+
+
+}
+
+
+std::string igConnector::confirmCloseDeal(std::string dealref) {
+
+  string temp = "";
+  CURL* ch = curl_easy_init();
+  string c_url = api_url + "/gateway/confirms/" + dealref;
+
+  curl_slist *headers = NULL;
+  rapidjson::Document d;  
+  headers = addHeaders();
+
+  curl_easy_setopt(ch,CURLOPT_URL,c_url.c_str());
+  curl_easy_setopt(ch,CURLOPT_WRITEFUNCTION,curl_write_handler);
+  curl_easy_setopt(ch,CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(ch,CURLOPT_WRITEDATA,&temp);
+  curl_easy_perform(ch);
+  curl_easy_cleanup(ch);
+
+  curl_slist_free_all(headers);
+  
+  d.Parse<0>(temp.c_str());
+  if (d.HasParseError() ) return "";
+
+  std::string status = d["dealStatus"].GetString();
+  std::string reason = d["reason"].GetString();
+
+  return status + ":" + reason;
+
+}
+
+
+
 
 
 curl_slist* igConnector::addHeaders() {

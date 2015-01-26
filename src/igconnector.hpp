@@ -61,17 +61,20 @@ public:
     virtual string getMode();
     virtual vector<bvex> getValues();
     virtual vector<bpex> getPositions();
-    virtual string openPos(string,string,int,int,int);
+    virtual bpex openPos(string,string,int,int,int);
     virtual string closePos(string);
     virtual int initPushService();
     virtual std::vector<brokerError*>* getErrors();
-    
+
     LSClient* getLSClient();
 
 
 private:
 
   brokerError* addError(int, string, string);
+
+  bpex confirmOpenDeal(std::string dealref);
+  string confirmCloseDeal(std::string dealref);
 
   string cst;
   string security_token;

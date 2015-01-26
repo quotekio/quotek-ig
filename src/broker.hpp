@@ -66,7 +66,7 @@ public:
     virtual vector<bvex> getValues();
     virtual vector<bpex> getPositions();
     virtual string closePos(string);
-    virtual string openPos(string, string, int ,int ,int);
+    virtual bpex openPos(string, string, int ,int ,int);
     virtual std::vector<brokerError*>* getErrors();
 
 private:

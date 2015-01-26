@@ -88,12 +88,13 @@ string broker::closePos(string dealid) {
   return "";
 }
 
-string broker::openPos(string epic,
+bpex broker::openPos(string epic,
                        string way,
                        int nbc,
                        int stop,
                        int limit) {
-  return "";
+  bpex p1;
+  return p1;
 }
 
 

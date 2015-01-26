@@ -38,6 +38,9 @@ typedef struct bvex {
 //broker connector position exchange
 typedef struct bpex
 {
+  std::string dealref;
+  std::string status;
+  std::string reason;
   std::string dealid;
   std::string epic;
   int size;
