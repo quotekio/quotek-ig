@@ -1,0 +1,10 @@
+BUGS
+====
+* Push-mode pas encore au point, des fois il cesse de fonctionner en faisant flat liner les cours
+
+PRIORITAIRE
+===========
+
+* Fixer le push mode une fois pour toutes (voir bug plus haut)
+* Ameliorer la perf sur les requetes open et closepos.
+
