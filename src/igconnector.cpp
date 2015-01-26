@@ -47,8 +47,6 @@ int igConnector::initialize(string broker_params,
                             bool use_profiling, 
                             string mode ) {
 
-      pthread_mutex_init( &lastpos_mtx, NULL );
-
       rapidjson::Document d;
       d.Parse<0>(broker_params.c_str());
 
@@ -314,7 +312,6 @@ vector<bvex> igConnector::getValues_poll() {
       return result;
 }
 
-
 vector<bpex> igConnector::getPositions() {
 
       vector<bpex> result;
@@ -383,34 +380,26 @@ vector<bpex> igConnector::getPositions() {
         addError(time(0), "getpos_error_api_response", temp);
       }
 
-      pthread_mutex_lock(&lastpos_mtx);
-      lastpos = result;
-      pthread_mutex_unlock(&lastpos_mtx);
       return result;
 }
 
-string igConnector::closePos(string dealid) {
+string igConnector::closePos(string dealid, int size) {
   
     string temp = "";
     string c_url = api_url + "/gateway/deal/positions/otc" ;
     curl_slist *headers = NULL;
     rapidjson::Document d;
     string pdata;
+    string way;
 
-    bpex pos;
-
-    pthread_mutex_lock(&lastpos_mtx);
-    //finds position in current list
-    for (int i=0;i<lastpos.size();i++) {
-      if (lastpos[i].dealid == dealid) {
-        pos = lastpos[i];
-        break;
-      }
+    if (size < 0) {
+      way = "BUY";
+      size *= -1;
     }
-    pthread_mutex_unlock(&lastpos_mtx);
 
-    string way = ( pos.size < 0 ) ? "BUY" : "SELL";
-    int size = (pos.size < 0) ? pos.size * -1 : pos.size; 
+    else  {
+      way = "SELL";
+    }
     
     headers = addHeaders();
 
@@ -420,7 +409,7 @@ string igConnector::closePos(string dealid) {
     pdata = "{\n";
     pdata += "    \"dealId\": \"" + dealid + "\",\n";
     pdata += "    \"expiry\": \"-\",\n";
-    pdata += "    \"direction\": \"" + upper(way) + "\",\n";
+    pdata += "    \"direction\": \"" + way + "\",\n";
     pdata += "    \"size\": \"" + int2string(size) + "\",\n";
     pdata += "    \"orderType\": \"MARKET\"\n";
     pdata += "}";
@@ -443,7 +432,7 @@ string igConnector::closePos(string dealid) {
     if (d.HasParseError() ) return "ERROR:NOJSON_ERROR";
 
 
-    string res = "ERROR: NULLREF";
+    string res = "ERROR:NULLREF";
 
     if (! d["dealReference"].IsNull() ) {
       string dealref = d["dealReference"].GetString();
@@ -544,7 +533,7 @@ bpex igConnector::confirmOpenDeal(std::string dealref ) {
 
   string temp = "";
   CURL* ch = curl_easy_init();
-  string c_url = api_url + "/gateway/confirms/" + dealref;
+  string c_url = api_url + "/gateway/deal/confirms/" + dealref;
 
   curl_slist *headers = NULL;
   rapidjson::Document d;  
@@ -562,15 +551,19 @@ bpex igConnector::confirmOpenDeal(std::string dealref ) {
   d.Parse<0>(temp.c_str());
   if (d.HasParseError() ) {
     ex1.status = "ERROR";
-    ex1.reason = "JSON_PARSING_ERROR";
+    ex1.reason = "CONFIRMDEAL_JSON_PARSING_ERROR";
     return ex1;
   };
 
   ex1.status = d["dealStatus"].GetString();
   ex1.reason = d["reason"].GetString();
   ex1.open = d["level"].GetDouble();
-  ex1.stop = d["stopLevel"].GetDouble();
-  ex1.limit = d["limitLevel"].GetDouble();
+  if (d["stopLevel"].IsNull()) ex1.stop = 0;
+  else ex1.stop = d["stopLevel"].GetDouble();
+
+  if (  d["limitLevel"].IsNull() ) ex1.limit = 0;
+  else ex1.limit = d["limitLevel"].GetDouble();
+
   ex1.dealid = d["dealId"].GetString();
   ex1.epic = d["epic"].GetString();
 
@@ -590,7 +583,7 @@ std::string igConnector::confirmCloseDeal(std::string dealref) {
 
   string temp = "";
   CURL* ch = curl_easy_init();
-  string c_url = api_url + "/gateway/confirms/" + dealref;
+  string c_url = api_url + "/gateway/deal/confirms/" + dealref;
 
   curl_slist *headers = NULL;
   rapidjson::Document d;  

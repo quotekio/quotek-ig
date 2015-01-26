@@ -65,7 +65,7 @@ public:
     virtual int setIndicesList(vector<string>);
     virtual vector<bvex> getValues();
     virtual vector<bpex> getPositions();
-    virtual string closePos(string);
+    virtual string closePos(string, int size);
     virtual bpex openPos(string, string, int ,int ,int);
     virtual std::vector<brokerError*>* getErrors();
 

@@ -62,7 +62,7 @@ public:
     virtual vector<bvex> getValues();
     virtual vector<bpex> getPositions();
     virtual bpex openPos(string,string,int,int,int);
-    virtual string closePos(string);
+    virtual string closePos(string, int size);
     virtual int initPushService();
     virtual std::vector<brokerError*>* getErrors();
 
@@ -81,9 +81,6 @@ private:
   string client_id;
   AssocArray<string> currencies_map;
   
-  vector<bpex> lastpos;
-  pthread_mutex_t lastpos_mtx;
-
   int uptime_s;
   LSClient* ls_client;
   string ls_endpoint;

@@ -83,7 +83,7 @@ vector<bpex> broker::getPositions() {
   return p1; 
 }
 
-string broker::closePos(string dealid) {
+string broker::closePos(string dealid, int size) {
 
   return "";
 }
