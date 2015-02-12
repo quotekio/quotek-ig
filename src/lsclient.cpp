@@ -210,7 +210,7 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
             if (line != "") {
 
               //debug
-              cout << line << endl << "==============" << endl ;
+              //cout << line << endl << "==============" << endl ;
 
               std::vector<std::string> values = split(line,'|');
               std::vector<std::string> values_map = split(values[0],',');
