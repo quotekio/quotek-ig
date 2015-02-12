@@ -195,9 +195,6 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
       if (lsc->getStatus() == LS_STATUS_CONNECTED || 
           lsc->getStatus() == LS_STATUS_RECEIVING ) {
 
-        //debug
-        cout << ls_stream << endl << "==============" << endl ;
-
         //actually parses data comming in stream connection
         if ( ls_stream.find("|") != std::string::npos )  {
 
@@ -211,6 +208,9 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
             trim(line);
 
             if (line != "") {
+
+              //debug
+              cout << line << endl << "==============" << endl ;
 
               std::vector<std::string> values = split(line,'|');
               std::vector<std::string> values_map = split(values[0],',');
