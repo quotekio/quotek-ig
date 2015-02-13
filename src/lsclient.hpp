@@ -83,6 +83,10 @@ class LSClient {
      */
     int connect();
 
+    /** This function rebinds the LSClient Stream Connection in case of unexpected closing.
+    */
+    int rebind();
+
     /** Sets the Lightstreamer Client status. It not meant to be used directly but needs to
      *  remain public.
      */
