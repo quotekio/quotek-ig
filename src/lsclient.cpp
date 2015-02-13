@@ -66,7 +66,7 @@ void LSClient::start()  {
 }
 
 void* LSClient::streamThreadWrapper(void* lsc) {
-  LSClient* lsc1 = static_cast<LSClient*>(lsc)
+  LSClient* lsc1 = static_cast<LSClient*>(lsc);
   lsc1->connect();
 
   while(1) {
@@ -109,7 +109,7 @@ int LSClient::rebind() {
   CURL* ch = req->get_curl_handler();
   curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, &LSClient::streamCallbackWrapper);
   curl_easy_setopt(ch,CURLOPT_WRITEDATA, this);
-  req->post2(create_session_url, pdata);
+  req->post2(bind_session_url, pdata);
 
   return 0;
 
