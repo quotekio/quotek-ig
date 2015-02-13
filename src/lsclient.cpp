@@ -59,22 +59,18 @@ LSClient::LSClient(std::string url,
 
 }
 
-
-
 void LSClient::start()  {
-  pthread_create(&stream_thread, NULL, LSClient::streamThreadWrapper, this);
+  stream_thread = new std::thread(LSClient::threadStart,this);
+
 }
 
-void* LSClient::streamThreadWrapper(void* lsc) {
-  LSClient* lsc1 = static_cast<LSClient*>(lsc);
-  lsc1->connect();
+void LSClient::threadStart(LSClient* lsc) {
 
+  lsc->connect();
   while(1) {
     cout  << "[LSClient] Stream connection closed, trying to reopen it." << endl;
-    lsc1->rebind();
+    lsc->rebind();
   }
-
-  return NULL;
 }
 
 int LSClient::connect() {
