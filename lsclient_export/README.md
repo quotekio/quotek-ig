@@ -13,6 +13,7 @@ Changelog
 * Bugfix: processing of multiple rows in a single payload
 * Auto rebinding of the stream connection in case of closing ( reached Content-Length, etc..)
 * Replacement of POSIX threads usage by C++11 std::thread for easier portability (windows)
+* Improved documentation
 
 Dependancies
 ------------
