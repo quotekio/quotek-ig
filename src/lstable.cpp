@@ -59,7 +59,10 @@ int LSTable::appendData(int item_num, std::vector<std::string> item_data) {
   }
   */
 
-  data[item_num] = item_data;
+  for (int i=0;i<item_data.size();i++) {
+    if ( item_data[i] != ""  ) data[item_num][i] = item_data[i];
+  }
+
   return 0;
 }
 
