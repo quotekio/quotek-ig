@@ -234,8 +234,9 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
               //cout << line << endl << "==============" << endl ;
 
               //replace Nullstr by "NULL"
+              line += "|";
               line = sreplace(line,"||","|NULL|");
-              
+
               std::vector<std::string> values = split(line,'|');
 
               std::vector<std::string> values_map = split(values[0],',');
