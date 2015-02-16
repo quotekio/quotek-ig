@@ -233,7 +233,11 @@ size_t LSClient::streamCallbackWrapper(void* ptr, size_t size, size_t nmemb, voi
               //debug
               //cout << line << endl << "==============" << endl ;
 
+              //replace Nullstr by "NULL"
+              line = sreplace(line,"||","|NULL|");
+              
               std::vector<std::string> values = split(line,'|');
+
               std::vector<std::string> values_map = split(values[0],',');
 
               int tnum = atoi(values_map[0].c_str());
