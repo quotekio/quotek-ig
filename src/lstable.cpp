@@ -50,18 +50,19 @@ std::vector<std::string>* LSTable::getItemData(int item_num) {
 }
 
 int LSTable::appendData(int item_num, std::vector<std::string> item_data) {
-  if ( item_data.size() != nb_fields ) return 1;
-
-  /*
-  //debug
-  for (int i=0;i<item_data.size();i++) {
-    if ( item_data[i] == "" ) cout << "WARNING: item value " << i << " is NULL" << endl;
+  if ( item_data.size() != nb_fields ) {
+    cout << "ERROR: item_data != nb_fields!" << endl;
+    return 1;
   }
-  */
 
-  for (int i=0;i<item_data.size();i++) {
-    if ( item_data[i] != ""  ) data[item_num][i] = item_data[i];
+  if (data[item_num].size() == item_data.size() ) {
+
+    for (int i=0;i<item_data.size();i++) {
+      if ( item_data[i] != ""  ) data[item_num][i] = item_data[i];
+    }
+
   }
+  else data[item_num] = item_data;
 
   return 0;
 }
