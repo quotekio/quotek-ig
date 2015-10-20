@@ -557,6 +557,10 @@ bpex igConnector::confirmOpenDeal(std::string dealref ) {
 
   ex1.status = d["dealStatus"].GetString();
   ex1.reason = d["reason"].GetString();
+
+  //error in deal opening, we return bpex object as is.
+  if ( ex1.status == "REJECTED" ) return ex1;
+
   ex1.open = d["level"].GetDouble();
   if (d["stopLevel"].IsNull()) ex1.stop = 0;
   else ex1.stop = d["stopLevel"].GetDouble();
