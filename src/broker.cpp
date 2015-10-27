@@ -91,8 +91,8 @@ string broker::closePos(string dealid, int size) {
 bpex broker::openPos(string epic,
                        string way,
                        int nbc,
-                       int stop,
-                       int limit) {
+                       float stop,
+                       float limit) {
   bpex p1;
   return p1;
 }

@@ -445,9 +445,12 @@ string igConnector::closePos(string dealid, int size) {
 
 }
 
-bpex igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
+bpex igConnector::openPos(string epic,string way,int nbc, float stop, float limit) {
 
     bpex ex1;
+
+    int stop_ = roundint(stop);
+    int limit_ = roundint(limit);
 
     string temp = "";
     string pdata = "";
@@ -460,18 +463,18 @@ bpex igConnector::openPos(string epic,string way,int nbc,int stop,int limit) {
     
     headers = addHeaders();
 
-    if (stop == 0) {
+    if (stop_ == 0) {
       stop_str = "null";
     }
     else {
-      stop_str = "\"" + int2string(stop) + "\"";
+      stop_str = "\"" + int2string(stop_) + "\"";
     }
 
-    if (limit == 0) {
+    if (limit_ == 0) {
       limit_str = "null";
     }
     else  {
-      limit_str = "\"" + int2string(limit) + "\"";
+      limit_str = "\"" + int2string(limit_) + "\"";
     }
 
     //build post data
